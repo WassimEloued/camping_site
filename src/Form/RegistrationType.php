@@ -41,11 +41,8 @@ class RegistrationType extends AbstractType
                     new NotBlank(),
                     new Length(['min' => 6]),
                 ],
-            ])
-            ->add('submit', SubmitType::class, [
-                'attr' => ['class' => 'btn btn-primary mt-3']
-            ]);
-    }
+                    ]);
+            }
 
     public function configureOptions(OptionsResolver $resolver): void
     {

@@ -1,0 +1,105 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create Event{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center align-items-center min-vh-100" style="background-image: url('{{ asset('bgindex.jpg') }}'); background-size: cover; background-position: center;">
+    <div class="col-lg-6 col-md-8 col-12">
+        <div class="card shadow-lg bg-white bg-opacity-75">
+            <div class="card-header text-center">
+                <h2 class="fw-bold">Create New Camping Event</h2>
+                <p class="text-muted">Fill out the details to post your event.</p>
+            </div>
+            
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label }} alert-dismissible fade show m-3" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            
+            <div class="card-body">
+                {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                    {{ form_errors(form) }}
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.title, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.title, {'attr': {'class': 'form-control' ~ (form.title.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'Event title'}}) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.title) }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.description, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.description, {'attr': {'class': 'form-control' ~ (form.description.vars.errors|length ? ' is-invalid' : ''), 'rows': 4}}) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.description) }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.location, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.location, {'attr': {'class': 'form-control' ~ (form.location.vars.errors|length ? ' is-invalid' : '')}}) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.location) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.maxParticipants, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.maxParticipants, {'attr': {'class': 'form-control' ~ (form.maxParticipants.vars.errors|length ? ' is-invalid' : '')}}) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.maxParticipants) }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.startDate, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.startDate, {'attr': {'class': 'form-control' ~ (form.startDate.vars.errors|length ? ' is-invalid' : '')}}) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.startDate) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.endDate, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.endDate, {'attr': {'class': 'form-control' ~ (form.endDate.vars.errors|length ? ' is-invalid' : '')}}) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.endDate) }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.budget, null, {'label_attr': {'class': 'form-label'}}) }}
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            {{ form_widget(form.budget, {'attr': {'class': 'form-control' ~ (form.budget.vars.errors|length ? ' is-invalid' : ''), 'step': '0.01'}}) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.budget) }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        {{ form_label(form.photo, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.photo, {'attr': {'class': 'form-control' ~ (form.photo.vars.errors|length ? ' is-invalid' : '')}}) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.photo) }}
+                        </div>
+                        <small class="text-muted">Max size: 2MB (JPEG or PNG only)</small>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg">Start Event</button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

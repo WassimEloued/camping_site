@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Access Denied{% endblock %}
+
+{% block body %}
+    <div class="alert alert-danger">
+        <h2>{{ message }}</h2>
+        <p>You do not have the required permissions to access this page. Please contact an administrator.</p>
+    </div>
+    <a href="{{ path('admin_dashboard') }}" class="btn btn-primary">Go Back</a>
+{% endblock %}

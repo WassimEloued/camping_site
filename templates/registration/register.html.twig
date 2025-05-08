@@ -1,0 +1,99 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center align-items-center min-vh-100" style="background-image: url('{{ asset('campbg.jpg') }}'); background-size: cover; background-position: center;">
+    <div class="col-lg-6 col-md-8 col-12">
+        <div class="card shadow-lg bg-white bg-opacity-90">
+            <div class="card-header text-center bg-primary text-white">
+                <h2 class="fw-bold">Create Your Account</h2>
+                <p class="mb-0">Join our camping community</p>
+            </div>
+            
+            <div class="card-body p-4">
+                {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                    {{ form_errors(form) }}
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.email, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.email, {'attr': {'class': 'form-control' ~ (form.email.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'your@email.com'}}) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.email) }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.password.first, 'Password', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.password.first, {'attr': {'class': 'form-control' ~ (form.password.first.vars.errors|length ? ' is-invalid' : '')}}) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.password.first) }}
+                        </div>
+                        <small class="text-muted">Minimum 6 characters</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.password.second, 'Repeat Password', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.password.second, {'attr': {'class': 'form-control' ~ (form.password.second.vars.errors|length ? ' is-invalid' : '')}}) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.password.second) }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="terms" required>
+                        <label class="form-check-label" for="terms">I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">terms and conditions</a></label>
+                        <div class="invalid-feedback">
+                            You must agree before submitting.
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">Register</button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+            
+            <div class="card-footer text-center bg-light">
+                <p class="mb-0">Already have an account? <a href="{{ path('app_login') }}" class="text-primary">Login here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Terms Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Terms and Conditions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Add your terms here -->
+                <p>By registering, you agree to our community guidelines and privacy policy...</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Client-side validation
+(() => {
+    'use strict'
+    const forms = document.querySelectorAll('.needs-validation')
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %}

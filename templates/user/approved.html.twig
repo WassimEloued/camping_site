@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Approved Events{% endblock %}
+
+{% block body %}
+    <h1>Approved Events</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Event Name</th>
+                <th scope="col">Date</th>
+                <th scope="col">Location</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in approvedEvents %}
+                <tr>
+                    <td>{{ event.name }}</td>
+                    <td>{{ event.date|date('Y-m-d') }}</td>
+                    <td>{{ event.location }}</td>
+                    <td><span class="badge bg-success">Approved</span></td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">No approved events found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

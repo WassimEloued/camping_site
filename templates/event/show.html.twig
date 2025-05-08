@@ -1,0 +1,130 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Event Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>{{ event.title }}</h1>
+                {% if is_granted('EDIT', event) %}
+                    <div class="btn-group">
+                        <a href="{{ path('event_edit', {'id': event.id}) }}" class="btn btn-outline-primary">Edit</a>
+                        <form method="post" action="{{ path('event_delete', {'id': event.id}) }}" onsubmit="return confirm('Are you sure?')">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
+                            <button class="btn btn-outline-danger">Delete</button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Event Image -->
+            {% if event.photo %}
+                <img src="{{ asset('uploads/events/' ~ event.photo) }}" class="img-fluid rounded mb-4" alt="{{ event.title }}">
+            {% endif %}
+
+            <!-- Event Details -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><i class="bi bi-geo-alt-fill"></i> <strong>Location:</strong> {{ event.location }}</p>
+                            <p><i class="bi bi-people-fill"></i> <strong>Participants:</strong> 
+                                {{ event.participants|length }}/{{ event.maxParticipants }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><i class="bi bi-calendar-event"></i> <strong>Dates:</strong> 
+                                {{ event.startDate|date('M d, Y') }} - {{ event.endDate|date('M d, Y') }}</p>
+                            <p><i class="bi bi-cash-stack"></i> <strong>Budget:</strong> ${{ event.budget|number_format(2) }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Description -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>About This Event</h3>
+                </div>
+                <div class="card-body">
+                    {{ event.description|nl2br }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header">
+                    <h3>Event Actions</h3>
+                </div>
+                <div class="card-body text-center">
+                    {% if isParticipant %}
+                        <form method="post" action="{{ path('event_leave', {'id': event.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('leave' ~ event.id) }}">
+                            <button class="btn btn-danger w-100 mb-3">
+                                <i class="bi bi-x-circle"></i> Leave Event
+                            </button>
+                        </form>
+                    {% else %}
+                        {% if event.participants|length < event.maxParticipants %}
+                            <form method="post" action="{{ path('event_join', {'id': event.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('join' ~ event.id) }}">
+                                <button class="btn btn-success w-100 mb-3">
+                                    <i class="bi bi-plus-circle"></i> Join Event
+                                </button>
+                            </form>
+                        {% else %}
+                            <button class="btn btn-secondary w-100 mb-3" disabled>
+                                Event Full
+                            </button>
+                        {% endif %}
+                    {% endif %}
+
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-primary">
+                            <i class="bi bi-share"></i> Share Event
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Participants List -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3>Participants ({{ event.participants|length }})</h3>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    <i class="bi bi-person-circle fs-4"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <strong>{{ event.creator.email }}</strong>
+                                    <div class="text-muted small">Organizer</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% for participant in event.participants %}
+                            <div class="list-group-item">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <i class="bi bi-person-circle fs-4"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        {{ participant.email }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

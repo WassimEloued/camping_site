@@ -1,0 +1,130 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center align-items-center min-vh-100" style="background-image: url('{{ asset('campbg.jpg') }}'); background-size: cover; background-position: center;">
+    <div class="col-lg-6 col-md-8 col-12">
+        <div class="card shadow-lg bg-white bg-opacity-90">
+            <div class="card-header text-center bg-primary text-white">
+                <h2 class="fw-bold">Welcome Back</h2>
+                <p class="mb-0">Please enter your credentials to login</p>
+            </div>
+            
+            <div class="card-body p-4">
+                {# Authentication Errors #}
+                {% if error is defined and error %}
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        {% if error.messageKey == 'Invalid credentials.' %}
+                            Invalid email or password
+                        {% else %}
+                            {{ error.messageKey|trans(error.messageData, 'security') }}
+                        {% endif %}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+                
+                {# Flash Messages #}
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+                
+                <form method="post" action="{{ path('app_login') }}" class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <label for="inputEmail" class="form-label">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="inputEmail" 
+                            name="_username" 
+                            class="form-control" 
+                            value="{{ last_username is defined ? last_username : '' }}"
+                            required
+                            autocomplete="email"
+                            autofocus
+                        >
+                        <div class="invalid-feedback">
+                            Please provide a valid email.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="inputPassword" class="form-label">Password</label>
+                        <input 
+                            type="password" 
+                            id="inputPassword" 
+                            name="_password" 
+                            class="form-control" 
+                            required
+                            autocomplete="current-password"
+                        >
+                        <div class="invalid-feedback">
+                            Please provide your password.
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="remember_me" name="_remember_me">
+                        <label class="form-check-label" for="remember_me">Remember me</label>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">Login</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="card-footer text-center bg-light">
+                <p class="mb-0">Don't have an account? <a href="{{ path('app_register') }}" class="text-primary">Register here</a></p>
+                <p class="mt-2 mb-0"><a href="{{ path('app_forgot_password') }}" class="text-muted">Forgot password?</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Enhanced client-side validation
+document.addEventListener('DOMContentLoaded', () => {
+    const forms = document.querySelectorAll('.needs-validation');
+    
+    forms.forEach(form => {
+        form.addEventListener('submit', function(event) {
+            if (!this.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                // Scroll to first invalid field
+                const invalidElements = this.querySelectorAll(':invalid');
+                if (invalidElements.length > 0) {
+                    invalidElements[0].scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
+            }
+            
+            this.classList.add('was-validated');
+        }, false);
+        
+        // Real-time validation
+        form.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', () => {
+                if (input.checkValidity()) {
+                    input.classList.remove('is-invalid');
+                    input.classList.add('is-valid');
+                } else {
+                    input.classList.remove('is-valid');
+                    input.classList.add('is-invalid');
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -16,7 +16,7 @@ class LoginController extends AbstractController
 {
     use TargetPathTrait;
 
-    #[Route('/login', name: 'app_login')]
+    #[Route('/', name: 'app_login')]
     public function login(
         Request $request,
         AuthenticationUtils $authenticationUtils,

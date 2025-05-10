@@ -11,16 +11,18 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class LoginController extends AbstractController
 {
     use TargetPathTrait;
 
-    #[Route('/login', name: 'app_login')]
+    #[Route('/', name: 'app_login')]
     public function login(
         Request $request,
         AuthenticationUtils $authenticationUtils,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        UserPasswordHasherInterface $passwordHasher
     ): Response {
         if ($this->getUser()) {
             return $this->redirectToRoute($this->isGranted('ROLE_ADMIN') ? 'admin_dashboard' : 'user_dashboard');
@@ -37,7 +39,7 @@ class LoginController extends AbstractController
                     throw new AuthenticationException('User not found.');
                 }
 
-                if ($user->getPassword() !== $password) {
+                if (!$passwordHasher->isPasswordValid($user, $password)) {
                     throw new AuthenticationException('Invalid credentials.');
                 }
 

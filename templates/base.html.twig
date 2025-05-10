@@ -67,12 +67,27 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('user_dashboard') }}">Admin-Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('event_create') }}">Create Event</a>
-                    </li>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('admin_dashboard') }}">Admin Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('event_create') }}">Create Event</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('event_index') }}">Manage Events</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('user_dashboard') }}">My Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('event_index') }}">Browse Events</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('event_my_events') }}">My Events</a>
+                        </li>
+                    {% endif %}
                 </ul>
                 <ul class="navbar-nav">
                     {% if app.user %}

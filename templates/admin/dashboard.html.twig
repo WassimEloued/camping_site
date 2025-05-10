@@ -1,128 +1,155 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Admin Dashboard - {{ parent() }}{% endblock %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        .stat-card {
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <h1 class="mb-4"><i class="bi bi-shield-lock"></i> Admin Dashboard</h1>
+<div class="container-fluid py-4">
+    <h1 class="mb-4">Admin Dashboard</h1>
 
-    <div class="row">
-        <!-- Quick Stats -->
-        <div class="col-md-4 mb-4">
-            <div class="card text-white bg-primary">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="bi bi-people"></i> Total Users</h5>
-                    <p class="display-4">{{ allUsers|length }}</p>
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card bg-primary text-white">
+                <div class="card-body text-center">
+                    <i class="bi bi-people-fill stat-icon"></i>
+                    <h5 class="card-title">Total Users</h5>
+                    <h2 class="mb-0">{{ stats.total_users }}</h2>
+                    <small>Active: {{ stats.active_users }}</small>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="card text-white bg-success">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="bi bi-calendar-check"></i> Approved Events</h5>
-                    <p class="display-4">{{ approvedEvents|length }}</p>
+        <div class="col-md-3">
+            <div class="card stat-card bg-success text-white">
+                <div class="card-body text-center">
+                    <i class="bi bi-calendar-event stat-icon"></i>
+                    <h5 class="card-title">Total Events</h5>
+                    <h2 class="mb-0">{{ stats.total_events }}</h2>
+                    <small>Approved: {{ stats.approved_events }}</small>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="card text-white bg-warning">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="bi bi-clock-history"></i> Pending Events</h5>
-                    <p class="display-4">{{ pendingEvents|length }}</p>
+        <div class="col-md-3">
+            <div class="card stat-card bg-warning text-white">
+                <div class="card-body text-center">
+                    <i class="bi bi-clock-history stat-icon"></i>
+                    <h5 class="card-title">Pending Events</h5>
+                    <h2 class="mb-0">{{ stats.pending_events }}</h2>
+                    <small>Need Review</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card bg-info text-white">
+                <div class="card-body text-center">
+                    <i class="bi bi-person-badge stat-icon"></i>
+                    <h5 class="card-title">User Types</h5>
+                    <h2 class="mb-0">{{ stats.admin_users }}</h2>
+                    <small>Admins / {{ stats.regular_users }} Regular Users</small>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Pending Events Section -->
-    <div class="card mb-4">
-        <div class="card-header bg-warning">
-            <h3><i class="bi bi-exclamation-triangle"></i> Pending Approval</h3>
+    <!-- Recent Activity -->
+    <div class="row">
+        <!-- Recent Events -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Recent Events</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for event in stats.recent_events %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ event.title }}</h6>
+                                    <small class="text-muted">{{ event.startDate|date('M d, Y') }}</small>
+                                </div>
+                                <p class="mb-1">{{ event.description|slice(0, 100) }}...</p>
+                                <small>Status: <span class="badge bg-{{ event.status == 'approved' ? 'success' : (event.status == 'pending' ? 'warning' : 'danger') }}">{{ event.status }}</span></small>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            {% if pendingEvents|length > 0 %}
-                <div class="row">
-                    {% for event in pendingEvents %}
-                        <div class="col-md-4 mb-3">
-                            <div class="card h-100">
-                                {% if event.photo %}
-                                    <img src="{{ asset('uploads/events/' ~ event.photo) }}" class="card-img-top" alt="{{ event.title }}">
-                                {% endif %}
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ event.title }}</h5>
-                                    <p class="card-text">
-                                        <small class="text-muted">
-                                            Created by: {{ event.creator.email }}<br>
-                                            {{ event.startDate|date('M d, Y') }}
-                                        </small>
-                                    </p>
-                                    <div class="d-grid gap-2">
-                                        <form method="post" action="{{ path('admin_event_approve', {'id': event.id}) }}">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ event.id) }}">
-                                            <button type="submit" class="btn btn-success btn-sm w-100">
-                                                <i class="bi bi-check-circle"></i> Approve
-                                            </button>
-                                        </form>
-                                        <form method="post" action="{{ path('admin_event_reject', {'id': event.id}) }}">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ event.id) }}">
-                                            <button type="submit" class="btn btn-danger btn-sm w-100">
-                                                <i class="bi bi-x-circle"></i> Reject
-                                            </button>
-                                        </form>
-                                    </div>
+
+        <!-- Recent Users -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Recent Users</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for user in stats.recent_users %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ user.email }}</h6>
+                                    <small class="text-muted">Role: {{ user.role }}</small>
+                                </div>
+                                <small>Status: <span class="badge bg-{{ user.isActive ? 'success' : 'danger' }}">{{ user.isActive ? 'Active' : 'Inactive' }}</span></small>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Status Distribution -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Event Status Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="progress mb-3">
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                     style="width: {{ (stats.events_by_status.approved / stats.total_events * 100)|round }}%">
+                                    Approved ({{ stats.events_by_status.approved }})
                                 </div>
                             </div>
                         </div>
-                    {% endfor %}
+                        <div class="col-md-4">
+                            <div class="progress mb-3">
+                                <div class="progress-bar bg-warning" role="progressbar" 
+                                     style="width: {{ (stats.events_by_status.pending / stats.total_events * 100)|round }}%">
+                                    Pending ({{ stats.events_by_status.pending }})
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="progress mb-3">
+                                <div class="progress-bar bg-danger" role="progressbar" 
+                                     style="width: {{ (stats.events_by_status.rejected / stats.total_events * 100)|round }}%">
+                                    Rejected ({{ stats.events_by_status.rejected }})
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            {% else %}
-                <div class="alert alert-info mb-0">No pending events for approval</div>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- User Management Section -->
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-            <h3><i class="bi bi-people-fill"></i> User Management</h3>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Events Created</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in allUsers %}
-                            <tr>
-                                <td>{{ user.email }}</td>
-                                <td>{{ user.role }}</td>
-                                <td>
-                                    <span class="badge bg-{{ user.isActive ? 'success' : 'danger' }}">
-                                        {{ user.isActive ? 'Active' : 'Inactive' }}
-                                    </span>
-                                </td>
-                                <td>{{ user.createdEvents|length }}</td>
-                                <td>
-                                    <form method="post" action="{{ path('admin_user_toggle', {'id': user.id}) }}">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('toggle' ~ user.id) }}">
-                                        <button type="submit" class="btn btn-{{ user.isActive ? 'danger' : 'success' }} btn-sm">
-                                            {{ user.isActive ? 'Deactivate' : 'Activate' }}
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>

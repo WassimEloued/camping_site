@@ -36,14 +36,37 @@ class UserController extends AbstractController
         UserRepository $userRepository,
         EventRepository $eventRepository
     ): Response {
+        // Get all users and events
         $allUsers = $userRepository->findAll();
+        $allEvents = $eventRepository->findAll();
         $approvedEvents = $eventRepository->findBy(['status' => 'approved']);
         $pendingEvents = $eventRepository->findBy(['status' => 'pending']);
+        $rejectedEvents = $eventRepository->findBy(['status' => 'rejected']);
+
+        // Calculate statistics
+        $stats = [
+            'total_users' => count($allUsers),
+            'total_events' => count($allEvents),
+            'approved_events' => count($approvedEvents),
+            'pending_events' => count($pendingEvents),
+            'rejected_events' => count($rejectedEvents),
+            'active_users' => count(array_filter($allUsers, fn($user) => $user->isActive())),
+            'admin_users' => count(array_filter($allUsers, fn($user) => $user->getRole() === 'ROLE_ADMIN')),
+            'regular_users' => count(array_filter($allUsers, fn($user) => $user->getRole() === 'ROLE_USER')),
+            'events_by_status' => [
+                'approved' => count($approvedEvents),
+                'pending' => count($pendingEvents),
+                'rejected' => count($rejectedEvents)
+            ],
+            'recent_events' => $eventRepository->findBy([], ['startDate' => 'DESC'], 5),
+            'recent_users' => $userRepository->findBy([], ['id' => 'DESC'], 5)
+        ];
 
         return $this->render('admin/dashboard.html.twig', [
             'allUsers' => $allUsers,
             'approvedEvents' => $approvedEvents,
             'pendingEvents' => $pendingEvents,
+            'stats' => $stats
         ]);
     }
 

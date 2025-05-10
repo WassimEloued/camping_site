@@ -1,0 +1,121 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Events - {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1><i class="bi bi-calendar-check"></i> My Events</h1>
+        </div>
+        <div class="col text-end">
+            <a href="{{ path('event_create') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Create New Event
+            </a>
+        </div>
+    </div>
+
+    <!-- Events I've Joined -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0"><i class="bi bi-people"></i> Events I've Joined</h3>
+        </div>
+        <div class="card-body">
+            {% if joinedEvents|length > 0 %}
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    {% for event in joinedEvents %}
+                        <div class="col">
+                            <div class="card h-100">
+                                {% if event.photo %}
+                                    <img src="{{ asset('uploads/events/' ~ event.photo) }}" class="card-img-top" alt="{{ event.title }}">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ event.title }}</h5>
+                                    <p class="card-text">{{ event.description|slice(0, 100) }}...</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="bi bi-geo-alt"></i> {{ event.location }}<br>
+                                            <i class="bi bi-calendar"></i> {{ event.startDate|date('M d, Y') }}
+                                        </small>
+                                        <span class="badge bg-primary">
+                                            {{ event.participants|length }}/{{ event.maxParticipants }} participants
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <div class="d-grid gap-2">
+                                        <a href="{{ path('event_show', {id: event.id}) }}" class="btn btn-outline-primary">
+                                            View Details
+                                        </a>
+                                        <form method="post" action="{{ path('event_leave', {id: event.id}) }}">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('leave' ~ event.id) }}">
+                                            <button type="submit" class="btn btn-outline-danger w-100">
+                                                Leave Event
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle"></i> You haven't joined any events yet.
+                    <a href="{{ path('event_index') }}" class="alert-link">Browse available events</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Events I've Created -->
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h3 class="mb-0"><i class="bi bi-plus-circle"></i> Events I've Created</h3>
+        </div>
+        <div class="card-body">
+            {% if createdEvents|length > 0 %}
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    {% for event in createdEvents %}
+                        <div class="col">
+                            <div class="card h-100">
+                                {% if event.photo %}
+                                    <img src="{{ asset('uploads/events/' ~ event.photo) }}" class="card-img-top" alt="{{ event.title }}">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ event.title }}</h5>
+                                    <p class="card-text">{{ event.description|slice(0, 100) }}...</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="bi bi-geo-alt"></i> {{ event.location }}<br>
+                                            <i class="bi bi-calendar"></i> {{ event.startDate|date('M d, Y') }}
+                                        </small>
+                                        <span class="badge bg-{{ event.status == 'approved' ? 'success' : 'warning' }}">
+                                            {{ event.status|capitalize }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <div class="d-grid gap-2">
+                                        <a href="{{ path('event_show', {id: event.id}) }}" class="btn btn-outline-primary">
+                                            View Details
+                                        </a>
+                                        <a href="{{ path('event_edit', {id: event.id}) }}" class="btn btn-outline-secondary">
+                                            Edit Event
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle"></i> You haven't created any events yet.
+                    <a href="{{ path('event_create') }}" class="alert-link">Create your first event</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

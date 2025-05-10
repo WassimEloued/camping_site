@@ -33,32 +33,43 @@ class PlainTextAuthenticator extends AbstractAuthenticator
         $email = $request->request->get('_username');
         $password = $request->request->get('_password');
 
+        if (!$email || !$password) {
+            throw new AuthenticationException('Please provide both email and password.');
+        }
+
         $user = $this->userRepository->findOneBy(['email' => $email]);
 
         if (!$user) {
-            throw new UserNotFoundException();
+            throw new UserNotFoundException('User not found.');
         }
 
-        // Compare plain text passwords directly
+        // For now, compare plain text passwords directly
         if ($user->getPassword() !== $password) {
-            throw new AuthenticationException('Invalid credentials');
+            throw new AuthenticationException('Invalid credentials.');
         }
 
-        return new SelfValidatingPassport(new UserBadge($email));
+        return new SelfValidatingPassport(
+            new UserBadge($email, function($email) {
+                return $this->userRepository->findOneBy(['email' => $email]);
+            })
+        );
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         $user = $token->getUser();
+        
+        // Redirect based on role
         if (in_array('ROLE_ADMIN', $user->getRoles())) {
             return new RedirectResponse($this->router->generate('admin_dashboard'));
         }
+        
         return new RedirectResponse($this->router->generate('user_dashboard'));
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        $request->getSession()->set('_security.last_error', $exception);
+        $request->getSession()->set('_security.last_error', $exception->getMessage());
         return new RedirectResponse($this->router->generate('app_login'));
     }
 }

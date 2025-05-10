@@ -2,6 +2,7 @@ security:
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
         App\Entity\User: 'auto'
+    
     providers:
         app_user_provider:
             entity:
@@ -16,24 +17,14 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-            form_login:
-                login_path: app_login
-                check_path: app_login
-                username_parameter: '_username'
-                password_parameter: '_password'
-                enable_csrf: true
-                use_forward: false
-                always_use_default_target_path: false
-                default_target_path: /
-                target_path_parameter: '_target_path'
-                use_referer: false
-                failure_path: null
-                failure_forward: false
-                failure_path_parameter: '_failure_path'
-                
+            custom_authenticator: App\Security\PlainTextAuthenticator
             logout:
                 path: app_logout
                 target: app_login
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800 # 1 week in seconds
+                path: /
 
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
@@ -42,6 +33,7 @@ security:
         - { path: ^/event/\d+/edit, roles: ROLE_USER }
         - { path: ^/event/\d+/join, roles: ROLE_USER }
         - { path: ^/event/\d+/leave, roles: ROLE_USER }
+        - { path: ^/event/my-events, roles: ROLE_USER }
 
 when@test:
     security:

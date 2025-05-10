@@ -40,7 +40,7 @@ class Event
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'joinedEvents')]
     private Collection $participants;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $photo = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'createdEvents')]

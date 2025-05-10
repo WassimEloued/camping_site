@@ -54,8 +54,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-        // Convert your enum role to Symfony's expected array format
-        return [$this->role];
+        $role = $this->role;
+        if (!str_starts_with($role, 'ROLE_')) {
+            $role = 'ROLE_' . strtoupper($role);
+        }
+        return [$role];
     }
 
     /**
@@ -110,14 +113,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getRole(): UserRole
+    public function getRole(): string
     {
-        return UserRole::from($this->role);
+        return $this->role;
     }
 
-    public function setRole(UserRole $role): static
+    public function setRole(string $role): static
     {
-        $this->role = $role->value; 
+        $this->role = $role;
         return $this;
     }
 
@@ -169,7 +172,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function isAdmin(): bool
     {
-        return $this->getRole() === UserRole::ADMIN;
+        return $this->getRole() === UserRole::ADMIN->value;
     }
     // src/Entity/User.php
 

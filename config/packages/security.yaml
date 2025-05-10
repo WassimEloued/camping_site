@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 security:
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
@@ -46,56 +45,4 @@ when@test:
                     users:
                         test_user:
                             password: '$2y$13$hKvxXxXxXxXxXxXxXxXxO5XxXxXxXxXxXxXxXxXxXxXxXxXxXxXx'
-=======
-security:
-    password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'plaintext'
-        App\Entity\User: 'plaintext'
-    providers:
-        app_user_provider:
-            entity:
-                class: App\Entity\User
-                property: 'email'
-
-    firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
-            
-        main:
-            lazy: true
-            provider: app_user_provider
-            form_login:
-                login_path: app_login
-                check_path: app_login
-                username_parameter: '_username'
-                password_parameter: '_password'
-                enable_csrf: true
-                use_forward: false
-                always_use_default_target_path: false
-                default_target_path: /
-                target_path_parameter: '_target_path'
-                use_referer: false
-                failure_path: null
-                failure_forward: false
-                failure_path_parameter: '_failure_path'
-                
-            logout:
-                path: app_logout
-                target: app_login
-
-    access_control:
-        - { path: ^/user/dashboard, roles: PUBLIC_ACCESS }
-        - { path: ^/event/create, roles: PUBLIC_ACCESS  }
-        - { path: ^/event/\d+/edit, roles: PUBLIC_ACCESS }
-
-when@test:
-    security:
-        providers:
-            in_memory:
-                memory:
-                    users:
-                        test_user:
-                            password: 'testpass'
->>>>>>> a4d87dea03d6a7090ff43db6c2da1b14f3f12d5d
                             roles: 'ROLE_USER'

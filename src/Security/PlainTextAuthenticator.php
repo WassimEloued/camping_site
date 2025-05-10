@@ -13,14 +13,16 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
-use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class PlainTextAuthenticator extends AbstractAuthenticator
 {
     public function __construct(
         private UserRepository $userRepository,
-        private RouterInterface $router
+        private RouterInterface $router,
+        private UserPasswordHasherInterface $passwordHasher
     ) {}
 
     public function supports(Request $request): ?bool
@@ -37,21 +39,17 @@ class PlainTextAuthenticator extends AbstractAuthenticator
             throw new AuthenticationException('Please provide both email and password.');
         }
 
-        $user = $this->userRepository->findOneBy(['email' => $email]);
-
-        if (!$user) {
-            throw new UserNotFoundException('User not found.');
-        }
-
-        // For now, compare plain text passwords directly
-        if ($user->getPassword() !== $password) {
-            throw new AuthenticationException('Invalid credentials.');
-        }
-
-        return new SelfValidatingPassport(
+        return new Passport(
             new UserBadge($email, function($email) {
-                return $this->userRepository->findOneBy(['email' => $email]);
-            })
+                $user = $this->userRepository->findOneBy(['email' => $email]);
+                if (!$user) {
+                    throw new UserNotFoundException('User not found.');
+                }
+                return $user;
+            }),
+            new CustomCredentials(function($credentials, User $user) {
+                return $this->passwordHasher->isPasswordValid($user, $credentials);
+            }, $password)
         );
     }
 
@@ -69,7 +67,9 @@ class PlainTextAuthenticator extends AbstractAuthenticator
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        $request->getSession()->set('_security.last_error', $exception->getMessage());
+        if ($request->hasSession()) {
+            $request->getSession()->set('_security.last_error', $exception);
+        }
         return new RedirectResponse($this->router->generate('app_login'));
     }
 }

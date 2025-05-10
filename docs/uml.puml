@@ -1,0 +1,117 @@
+@startuml Camping Site UML
+
+' Style settings
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+
+' Entities
+class User {
+    -id: int
+    -email: string
+    -password: string
+    -roles: array
+    -isActive: boolean
+    +getEmail(): string
+    +getRoles(): array
+    +isActive(): boolean
+    +isAdmin(): boolean
+}
+
+class Event {
+    -id: int
+    -title: string
+    -description: text
+    -startDate: datetime
+    -endDate: datetime
+    -location: string
+    -maxParticipants: int
+    -status: string
+    -photo: string
+    +getTitle(): string
+    +getStatus(): string
+    +isFull(): boolean
+}
+
+class UserController {
+    +userDashboard(): Response
+    +adminDashboard(): Response
+    +toggleUserStatus(): Response
+    +editProfile(): Response
+}
+
+class EventController {
+    +index(): Response
+    +show(): Response
+    +create(): Response
+    +edit(): Response
+    +join(): Response
+    +leave(): Response
+    +approve(): Response
+    +reject(): Response
+    +delete(): Response
+}
+
+class LoginController {
+    +login(): Response
+    +logout(): void
+}
+
+class RegistrationController {
+    +register(): Response
+}
+
+class PlainTextAuthenticator {
+    +supports(): bool
+    +authenticate(): Passport
+    +onAuthenticationSuccess(): Response
+    +onAuthenticationFailure(): Response
+}
+
+' Relationships
+User "1" -- "*" Event : creates >
+User "*" -- "*" Event : participates in >
+UserController --> User : manages
+EventController --> Event : manages
+LoginController --> PlainTextAuthenticator : uses
+RegistrationController --> User : creates
+PlainTextAuthenticator --> User : authenticates
+
+' Form Types
+class EventType {
+    +buildForm(): void
+}
+
+class RegistrationType {
+    +buildForm(): void
+}
+
+class UserProfileType {
+    +buildForm(): void
+}
+
+' Form Relationships
+EventController --> EventType : uses
+RegistrationController --> RegistrationType : uses
+UserController --> UserProfileType : uses
+
+' Repositories
+class UserRepository {
+    +findOneByEmail(): User
+    +findAll(): array
+}
+
+class EventRepository {
+    +findByStatus(): array
+    +findAll(): array
+}
+
+' Repository Relationships
+UserController --> UserRepository : uses
+EventController --> EventRepository : uses
+PlainTextAuthenticator --> UserRepository : uses
+
+@enduml 

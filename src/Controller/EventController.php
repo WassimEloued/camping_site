@@ -221,4 +221,93 @@ class EventController extends AbstractController
 
         return $this->redirectToRoute('admin_dashboard');
     }
+
+    #[Route('/admin/events/bulk-approve', name: 'admin_events_bulk_approve', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function bulkApproveEvents(
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $data = json_decode($request->getContent(), true);
+        
+        if (!$data || !isset($data['eventIds']) || !is_array($data['eventIds'])) {
+            return $this->json(['error' => 'Invalid data provided'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $events = $entityManager->getRepository(Event::class)->findBy(['id' => $data['eventIds']]);
+        
+        foreach ($events as $event) {
+            $event->setStatus('approved');
+        }
+
+        $entityManager->flush();
+
+        return $this->json(['message' => 'Events approved successfully']);
+    }
+
+    #[Route('/admin/events/bulk-reject', name: 'admin_events_bulk_reject', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function bulkRejectEvents(
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $data = json_decode($request->getContent(), true);
+        
+        if (!$data || !isset($data['eventIds']) || !is_array($data['eventIds'])) {
+            return $this->json(['error' => 'Invalid data provided'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $events = $entityManager->getRepository(Event::class)->findBy(['id' => $data['eventIds']]);
+        
+        foreach ($events as $event) {
+            $event->setStatus('rejected');
+        }
+
+        $entityManager->flush();
+
+        return $this->json(['message' => 'Events rejected successfully']);
+    }
+
+    #[Route('/admin/events/filter', name: 'admin_events_filter', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function filterEvents(
+        Request $request,
+        EventRepository $eventRepository
+    ): Response {
+        $status = $request->query->get('status');
+        $date = $request->query->get('date');
+        $search = $request->query->get('search');
+
+        $criteria = [];
+        if ($status) {
+            $criteria['status'] = $status;
+        }
+        if ($date) {
+            $criteria['startDate'] = new \DateTime($date);
+        }
+
+        $events = $eventRepository->findBy($criteria);
+        
+        if ($search) {
+            $events = array_filter($events, function($event) use ($search) {
+                return stripos($event->getTitle(), $search) !== false ||
+                       stripos($event->getDescription(), $search) !== false;
+            });
+        }
+
+        $data = array_map(function($event) {
+            return [
+                'id' => $event->getId(),
+                'title' => $event->getTitle(),
+                'description' => $event->getDescription(),
+                'startDate' => $event->getStartDate()->format('Y-m-d H:i:s'),
+                'status' => $event->getStatus(),
+                'creator' => $event->getCreator()->getEmail(),
+                'participants' => count($event->getParticipants()),
+                'maxParticipants' => $event->getMaxParticipants()
+            ];
+        }, $events);
+
+        return $this->json($data);
+    }
 }

@@ -2,60 +2,175 @@
 
 {% block title %}Register{% endblock %}
 
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .register-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+    
+    .register-card {
+        width: 100%;
+        max-width: 500px;
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .register-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 2rem;
+    }
+    
+    .register-body {
+        padding: 2rem;
+        background: white;
+        border-radius: 0 0 15px 15px;
+    }
+    
+    .form-control {
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .form-control:focus {
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        border-color: #3498db;
+    }
+    
+    .btn-register {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        border: none;
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+    }
+    
+    .register-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+    
+    .register-footer a {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .register-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .form-check-input:checked {
+        background-color: #3498db;
+        border-color: #3498db;
+    }
+
+    .terms-link {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .terms-link:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
 {% block body %}
-<div class="row justify-content-center align-items-center min-vh-100" style="background-image: url('{{ asset('campbg.jpg') }}'); background-size: cover; background-position: center;">
-    <div class="col-lg-6 col-md-8 col-12">
-        <div class="card shadow-lg bg-white bg-opacity-90">
-            <div class="card-header text-center bg-primary text-white">
-                <h2 class="fw-bold">Create Your Account</h2>
-                <p class="mb-0">Join our camping community</p>
-            </div>
+<div class="register-container">
+    <div class="register-card">
+        <div class="register-header text-center">
+            <h2 class="fw-bold mb-2">Create Your Account</h2>
+            <p class="mb-0">Join our camping community</p>
+        </div>
+        
+        <div class="register-body">
+            {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                {{ form_errors(form) }}
+                
+                <div class="mb-3">
+                    {{ form_label(form.email, null, {'label_attr': {'class': 'form-label'}}) }}
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                        {{ form_widget(form.email, {
+                            'attr': {
+                                'class': 'form-control' ~ (form.email.vars.errors|length ? ' is-invalid' : ''),
+                                'placeholder': 'Enter your email'
+                            }
+                        }) }}
+                    </div>
+                    <div class="invalid-feedback">
+                        {{ form_errors(form.email) }}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    {{ form_label(form.password.first, 'Password', {'label_attr': {'class': 'form-label'}}) }}
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                        {{ form_widget(form.password.first, {
+                            'attr': {
+                                'class': 'form-control' ~ (form.password.first.vars.errors|length ? ' is-invalid' : ''),
+                                'placeholder': 'Enter your password'
+                            }
+                        }) }}
+                    </div>
+                    <div class="invalid-feedback">
+                        {{ form_errors(form.password.first) }}
+                    </div>
+                    <small class="text-muted">Minimum 6 characters</small>
+                </div>
+                
+                <div class="mb-3">
+                    {{ form_label(form.password.second, 'Repeat Password', {'label_attr': {'class': 'form-label'}}) }}
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                        {{ form_widget(form.password.second, {
+                            'attr': {
+                                'class': 'form-control' ~ (form.password.second.vars.errors|length ? ' is-invalid' : ''),
+                                'placeholder': 'Confirm your password'
+                            }
+                        }) }}
+                    </div>
+                    <div class="invalid-feedback">
+                        {{ form_errors(form.password.second) }}
+                    </div>
+                </div>
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="terms" required>
+                    <label class="form-check-label" for="terms">
+                        I agree to the <a href="#" class="terms-link" data-bs-toggle="modal" data-bs-target="#termsModal">terms and conditions</a>
+                    </label>
+                    <div class="invalid-feedback">
+                        You must agree before submitting.
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-register">
+                        <i class="bi bi-person-plus me-2"></i>Create Account
+                    </button>
+                </div>
+            {{ form_end(form) }}
             
-            <div class="card-body p-4">
-                {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
-                    {{ form_errors(form) }}
-                    
-                    <div class="mb-3">
-                        {{ form_label(form.email, null, {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(form.email, {'attr': {'class': 'form-control' ~ (form.email.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'your@email.com'}}) }}
-                        <div class="invalid-feedback">
-                            {{ form_errors(form.email) }}
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form_label(form.password.first, 'Password', {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(form.password.first, {'attr': {'class': 'form-control' ~ (form.password.first.vars.errors|length ? ' is-invalid' : '')}}) }}
-                        <div class="invalid-feedback">
-                            {{ form_errors(form.password.first) }}
-                        </div>
-                        <small class="text-muted">Minimum 6 characters</small>
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form_label(form.password.second, 'Repeat Password', {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(form.password.second, {'attr': {'class': 'form-control' ~ (form.password.second.vars.errors|length ? ' is-invalid' : '')}}) }}
-                        <div class="invalid-feedback">
-                            {{ form_errors(form.password.second) }}
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="terms" required>
-                        <label class="form-check-label" for="terms">I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">terms and conditions</a></label>
-                        <div class="invalid-feedback">
-                            You must agree before submitting.
-                        </div>
-                    </div>
-                    
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg">Register</button>
-                    </div>
-                {{ form_end(form) }}
-            </div>
-            
-            <div class="card-footer text-center bg-light">
-                <p class="mb-0">Already have an account? <a href="{{ path('app_login') }}" class="text-primary">Login here</a></p>
+            <div class="register-footer">
+                <p class="mb-0">Already have an account? <a href="{{ path('app_login') }}">Login here</a></p>
             </div>
         </div>
     </div>
@@ -70,8 +185,21 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <!-- Add your terms here -->
-                <p>By registering, you agree to our community guidelines and privacy policy...</p>
+                <h6>Community Guidelines</h6>
+                <p>By registering, you agree to:</p>
+                <ul>
+                    <li>Provide accurate and truthful information</li>
+                    <li>Respect other community members</li>
+                    <li>Follow safety guidelines for camping events</li>
+                    <li>Maintain appropriate behavior at all times</li>
+                </ul>
+                <h6>Privacy Policy</h6>
+                <p>We respect your privacy and will:</p>
+                <ul>
+                    <li>Protect your personal information</li>
+                    <li>Never share your data with third parties</li>
+                    <li>Allow you to delete your account at any time</li>
+                </ul>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -81,19 +209,39 @@
 </div>
 
 <script>
-// Client-side validation
-(() => {
-    'use strict'
-    const forms = document.querySelectorAll('.needs-validation')
-    Array.from(forms).forEach(form => {
-        form.addEventListener('submit', event => {
-            if (!form.checkValidity()) {
-                event.preventDefault()
-                event.stopPropagation()
+document.addEventListener('DOMContentLoaded', () => {
+    const forms = document.querySelectorAll('.needs-validation');
+    
+    forms.forEach(form => {
+        form.addEventListener('submit', function(event) {
+            if (!this.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                const invalidElements = this.querySelectorAll(':invalid');
+                if (invalidElements.length > 0) {
+                    invalidElements[0].scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
             }
-            form.classList.add('was-validated')
-        }, false)
-    })
-})()
+            
+            this.classList.add('was-validated');
+        }, false);
+        
+        form.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', () => {
+                if (input.checkValidity()) {
+                    input.classList.remove('is-invalid');
+                    input.classList.add('is-valid');
+                } else {
+                    input.classList.remove('is-valid');
+                    input.classList.add('is-invalid');
+                }
+            });
+        });
+    });
+});
 </script>
 {% endblock %}

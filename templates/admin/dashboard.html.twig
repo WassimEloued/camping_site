@@ -16,6 +16,15 @@
             font-size: 2rem;
             margin-bottom: 1rem;
         }
+        .action-buttons .btn {
+            margin: 0 2px;
+        }
+        .filter-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
     </style>
 {% endblock %}
 
@@ -62,6 +71,153 @@
                     <h5 class="card-title">User Types</h5>
                     <h2 class="mb-0">{{ stats.admin_users }}</h2>
                     <small>Admins / {{ stats.regular_users }} Regular Users</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Management Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">User Management</h5>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="exportUsers">
+                            <i class="bi bi-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="filter-section">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" id="userSearch" placeholder="Search users...">
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="userRoleFilter">
+                                    <option value="">All Roles</option>
+                                    <option value="ROLE_ADMIN">Administrators</option>
+                                    <option value="ROLE_USER">Regular Users</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Created Events</th>
+                                    <th>Joined Events</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in allUsers %}
+                                <tr>
+                                    <td>{{ user.id }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.role }}</td>
+                                    <td>{{ user.createdEvents|length }}</td>
+                                    <td>{{ user.joinedEvents|length }}</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="editUser({{ user.id }})">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteUser({{ user.id }})">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Management Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Event Management</h5>
+                </div>
+                <div class="card-body">
+                    <div class="filter-section">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" id="eventSearch" placeholder="Search events...">
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="eventStatusFilter">
+                                    <option value="">All Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="date" class="form-control" id="eventDateFilter" placeholder="Filter by date">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Creator</th>
+                                    <th>Date</th>
+                                    <th>Participants</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for event in allEvents %}
+                                <tr>
+                                    <td>{{ event.id }}</td>
+                                    <td>{{ event.title }}</td>
+                                    <td>{{ event.creator.email }}</td>
+                                    <td>{{ event.startDate|date('Y-m-d') }}</td>
+                                    <td>{{ event.participants|length }}/{{ event.maxParticipants }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ event.status == 'approved' ? 'success' : (event.status == 'pending' ? 'warning' : 'danger') }}">
+                                            {{ event.status|title }}
+                                        </span>
+                                    </td>
+                                    <td class="action-buttons">
+                                        <a href="{{ path('event_show', {id: event.id}) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        {% if event.status == 'pending' %}
+                                            <form method="POST" action="{{ path('admin_event_approve', {id: event.id}) }}" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-success">
+                                                    <i class="bi bi-check"></i>
+                                                </button>
+                                            </form>
+                                            <form method="POST" action="{{ path('event_reject', {id: event.id}) }}" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteEvent({{ event.id }})">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -127,7 +283,7 @@
                         <div class="col-md-4">
                             <div class="progress mb-3">
                                 <div class="progress-bar bg-success" role="progressbar" 
-                                     style="width: {{ (stats.events_by_status.approved / stats.total_events * 100)|round }}%">
+                                     style="width: {{ stats.total_events > 0 ? (stats.events_by_status.approved / stats.total_events * 100)|round : 0 }}%">
                                     Approved ({{ stats.events_by_status.approved }})
                                 </div>
                             </div>
@@ -135,7 +291,7 @@
                         <div class="col-md-4">
                             <div class="progress mb-3">
                                 <div class="progress-bar bg-warning" role="progressbar" 
-                                     style="width: {{ (stats.events_by_status.pending / stats.total_events * 100)|round }}%">
+                                     style="width: {{ stats.total_events > 0 ? (stats.events_by_status.pending / stats.total_events * 100)|round : 0 }}%">
                                     Pending ({{ stats.events_by_status.pending }})
                                 </div>
                             </div>
@@ -143,7 +299,7 @@
                         <div class="col-md-4">
                             <div class="progress mb-3">
                                 <div class="progress-bar bg-danger" role="progressbar" 
-                                     style="width: {{ (stats.events_by_status.rejected / stats.total_events * 100)|round }}%">
+                                     style="width: {{ stats.total_events > 0 ? (stats.events_by_status.rejected / stats.total_events * 100)|round : 0 }}%">
                                     Rejected ({{ stats.events_by_status.rejected }})
                                 </div>
                             </div>
@@ -154,4 +310,137 @@
         </div>
     </div>
 </div>
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // User search and filter functionality
+    const userSearch = document.getElementById('userSearch');
+    const userRoleFilter = document.getElementById('userRoleFilter');
+    const userTable = document.querySelector('.table-responsive table tbody');
+    
+    function filterUsers() {
+        const searchTerm = userSearch.value.toLowerCase();
+        const roleFilter = userRoleFilter.value;
+        const rows = userTable.getElementsByTagName('tr');
+        
+        for (let row of rows) {
+            const email = row.cells[1].textContent.toLowerCase();
+            const role = row.cells[2].textContent;
+            const matchesSearch = email.includes(searchTerm);
+            const matchesRole = !roleFilter || role === roleFilter;
+            
+            row.style.display = matchesSearch && matchesRole ? '' : 'none';
+        }
+    }
+    
+    userSearch.addEventListener('input', filterUsers);
+    userRoleFilter.addEventListener('change', filterUsers);
+
+    // Event search and filter functionality
+    const eventSearch = document.getElementById('eventSearch');
+    const eventStatusFilter = document.getElementById('eventStatusFilter');
+    const eventDateFilter = document.getElementById('eventDateFilter');
+    const eventTable = document.querySelectorAll('.table-responsive table')[1].querySelector('tbody');
+    
+    function filterEvents() {
+        const searchTerm = eventSearch.value.toLowerCase();
+        const statusFilter = eventStatusFilter.value;
+        const dateFilter = eventDateFilter.value;
+        const rows = eventTable.getElementsByTagName('tr');
+        
+        for (let row of rows) {
+            const title = row.cells[1].textContent.toLowerCase();
+            const status = row.cells[5].textContent.trim();
+            const date = row.cells[3].textContent;
+            
+            const matchesSearch = title.includes(searchTerm);
+            const matchesStatus = !statusFilter || status.toLowerCase() === statusFilter;
+            const matchesDate = !dateFilter || date === dateFilter;
+            
+            row.style.display = matchesSearch && matchesStatus && matchesDate ? '' : 'none';
+        }
+    }
+    
+    eventSearch.addEventListener('input', filterEvents);
+    eventStatusFilter.addEventListener('change', filterEvents);
+    eventDateFilter.addEventListener('change', filterEvents);
+
+    // Export users
+    document.getElementById('exportUsers').addEventListener('click', function() {
+        window.location.href = '{{ path('admin_users_export') }}';
+    });
+
+    // Edit user function
+    window.editUser = async function(userId) {
+        const email = prompt('Enter new email:');
+        const password = prompt('Enter new password (leave empty to keep current):');
+        const role = prompt('Enter new role (ROLE_USER or ROLE_ADMIN):');
+
+        if (!email) return;
+
+        try {
+            const response = await fetch(`/admin/user/${userId}/edit`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password, role })
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                const data = await response.json();
+                alert(data.error || 'Error updating user');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error updating user');
+        }
+    };
+
+    // Delete user function
+    window.deleteUser = async function(userId) {
+        if (!confirm('Are you sure you want to delete this user?')) return;
+
+        try {
+            const response = await fetch(`/admin/user/${userId}/delete`, {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Error deleting user');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error deleting user');
+        }
+    };
+
+    // Delete event function
+    window.deleteEvent = async function(eventId) {
+        if (!confirm('Are you sure you want to delete this event?')) return;
+
+        try {
+            const response = await fetch(`/admin/event/${eventId}/delete`, {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                const data = await response.json();
+                alert(data.error || 'Error deleting event');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error deleting event');
+        }
+    };
+});
+</script>
+{% endblock %}
 {% endblock %} 

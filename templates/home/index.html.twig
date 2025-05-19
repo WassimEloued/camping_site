@@ -6,35 +6,187 @@
     {{ parent() }}
     <style>
         .hero-section {
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{{ asset('images/campbg.jpg') }}');
-            background-size: cover;
-            background-position: center;
-            padding: 100px 0;
+            background: linear-gradient(135deg, rgba(44, 62, 80, 0.9) 0%, rgba(52, 152, 219, 0.9) 100%);
+            padding: 6rem 0;
             margin-top: -1.5rem;
-            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('{{ asset('images/campbg.jpg') }}') center/cover no-repeat;
+            opacity: 0.1;
+            z-index: 0;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .features-section {
+            padding: 5rem 0;
+            background: #f8f9fa;
         }
         
         .feature-card {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s ease;
-            height: 100%;
         }
         
         .feature-card:hover {
-            transform: translateY(-10px);
+            transform: translateY(-5px);
         }
         
         .feature-icon {
             font-size: 2.5rem;
+            color: #3498db;
             margin-bottom: 1rem;
-            color: var(--secondary-color);
         }
         
         .cta-section {
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('{{ asset('images/campbg.jpg') }}');
-            background-size: cover;
-            background-position: center;
-            padding: 80px 0;
-            margin: 3rem 0;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            padding: 5rem 0;
+            color: white;
+        }
+        
+        .testimonial-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .testimonial-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #3498db;
+        }
+        
+        .btn-hero {
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-hero:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-outline-light {
+            border-width: 2px;
+        }
+
+        .destination-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .destination-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .destination-card .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .destination-card .card-body {
+            padding: 1.5rem;
+        }
+
+        .destination-card .card-title {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .destination-card .card-text {
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+        }
+
+        .destination-card .badge {
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+        }
+
+        .destination-card .btn-outline-primary {
+            border-width: 2px;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+        }
+
+        .destination-card .btn-outline-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(52, 152, 219, 0.2);
+        }
+
+        .essentials-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .essentials-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .essentials-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+
+        .essentials-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .essentials-card h5 {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .essentials-card p {
+            color: #6c757d;
+            font-size: 0.95rem;
+            margin-bottom: 0;
         }
     </style>
 {% endblock %}
@@ -42,51 +194,61 @@
 {% block body %}
     <!-- Hero Section -->
     <section class="hero-section text-white text-center">
-        <div class="container">
+        <div class="container hero-content">
             <h1 class="display-3 fw-bold mb-4">Discover Your Next Adventure</h1>
             <p class="lead mb-5">Join our community of outdoor enthusiasts and create unforgettable camping experiences.</p>
             {% if not app.user %}
                 <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
-                    <a href="{{ path('app_register') }}" class="btn btn-primary btn-lg px-4 gap-3">Get Started</a>
-                    <a href="{{ path('app_login') }}" class="btn btn-outline-light btn-lg px-4">Sign In</a>
+                    <a href="{{ path('app_register') }}" class="btn btn-primary btn-hero">
+                        <i class="bi bi-person-plus me-2"></i>Get Started
+                    </a>
+                    <a href="{{ path('app_login') }}" class="btn btn-outline-light btn-hero">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                    </a>
                 </div>
             {% else %}
                 <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
-                    <a href="{{ path('event_index') }}" class="btn btn-primary btn-lg px-4 gap-3">Browse Events</a>
-                    <a href="{{ path('user_dashboard') }}" class="btn btn-outline-light btn-lg px-4">My Dashboard</a>
+                    <a href="{{ path('event_index') }}" class="btn btn-primary btn-hero">
+                        <i class="bi bi-calendar-event me-2"></i>Browse Events
+                    </a>
+                    <a href="{{ path('user_dashboard') }}" class="btn btn-outline-light btn-hero">
+                        <i class="bi bi-person-circle me-2"></i>My Dashboard
+                    </a>
                 </div>
             {% endif %}
         </div>
     </section>
 
     <!-- Features Section -->
-    <section class="container mb-5">
-        <h2 class="text-center mb-5">Why Choose WeAreCampers?</h2>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card feature-card h-100">
-                    <div class="card-body text-center p-4">
-                        <i class="bi bi-calendar-event feature-icon"></i>
-                        <h3 class="h4 mb-3">Find Events</h3>
-                        <p class="text-muted">Discover camping events near you or create your own. Connect with fellow campers and share experiences.</p>
+    <section class="features-section">
+        <div class="container">
+            <h2 class="text-center mb-5">Why Choose WeAreCampers?</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <h4>Community Driven</h4>
+                        <p class="text-muted">Connect with fellow campers and share your experiences in a supportive community.</p>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card feature-card h-100">
-                    <div class="card-body text-center p-4">
-                        <i class="bi bi-people feature-icon"></i>
-                        <h3 class="h4 mb-3">Join Community</h3>
-                        <p class="text-muted">Connect with like-minded outdoor enthusiasts. Share stories, tips, and create lasting friendships.</p>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <h4>Easy Planning</h4>
+                        <p class="text-muted">Find and join camping events or create your own with our simple event management system.</p>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card feature-card h-100">
-                    <div class="card-body text-center p-4">
-                        <i class="bi bi-geo-alt feature-icon"></i>
-                        <h3 class="h4 mb-3">Explore Nature</h3>
-                        <p class="text-muted">Discover new camping spots and explore the great outdoors with our community of adventurers.</p>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h4>Safe & Secure</h4>
+                        <p class="text-muted">Verified events and participants ensure a safe and enjoyable camping experience.</p>
                     </div>
                 </div>
             </div>
@@ -94,62 +256,60 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="cta-section text-white text-center">
+    <section class="cta-section text-center">
         <div class="container">
             <h2 class="display-5 fw-bold mb-4">Ready to Start Your Adventure?</h2>
             <p class="lead mb-5">Join thousands of campers who are already part of our community.</p>
             {% if not app.user %}
-                <a href="{{ path('app_register') }}" class="btn btn-primary btn-lg px-5">Join Now</a>
+                <a href="{{ path('app_register') }}" class="btn btn-light btn-hero">
+                    <i class="bi bi-person-plus me-2"></i>Join Now
+                </a>
             {% else %}
-                <a href="{{ path('event_index') }}" class="btn btn-primary btn-lg px-5">Browse Events</a>
+                <a href="{{ path('event_index') }}" class="btn btn-light btn-hero">
+                    <i class="bi bi-calendar-event me-2"></i>Browse Events
+                </a>
             {% endif %}
         </div>
     </section>
 
-    <!-- Testimonials Section -->
-    <section class="container mb-5">
-        <h2 class="text-center mb-5">What Our Members Say</h2>
+    <!-- Camping Essentials Section -->
+    <section class="container py-5">
+        <h2 class="text-center mb-5">Camping Essentials</h2>
         <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="bi bi-person-circle fs-1 me-3 text-primary"></i>
-                            <div>
-                                <h5 class="mb-0">John Doe</h5>
-                                <small class="text-muted">Active Member</small>
-                            </div>
-                        </div>
-                        <p class="card-text">"WeAreCampers has completely transformed how I plan my camping trips. The community is amazing!"</p>
+            <div class="col-md-3">
+                <div class="essentials-card text-center">
+                    <div class="essentials-icon">
+                        <i class="bi bi-tent"></i>
                     </div>
+                    <h5>Camping Gear</h5>
+                    <p>Essential equipment for a comfortable outdoor experience</p>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="bi bi-person-circle fs-1 me-3 text-primary"></i>
-                            <div>
-                                <h5 class="mb-0">Jane Smith</h5>
-                                <small class="text-muted">Event Organizer</small>
-                            </div>
-                        </div>
-                        <p class="card-text">"Creating and managing events has never been easier. The platform is intuitive and user-friendly."</p>
+            <div class="col-md-3">
+                <div class="essentials-card text-center">
+                    <div class="essentials-icon">
+                        <i class="bi bi-map"></i>
                     </div>
+                    <h5>Location Guide</h5>
+                    <p>Find the perfect camping spot for your adventure</p>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="bi bi-person-circle fs-1 me-3 text-primary"></i>
-                            <div>
-                                <h5 class="mb-0">Mike Johnson</h5>
-                                <small class="text-muted">Regular Camper</small>
-                            </div>
-                        </div>
-                        <p class="card-text">"I've met so many great people through WeAreCampers. It's more than just a platform, it's a community."</p>
+            <div class="col-md-3">
+                <div class="essentials-card text-center">
+                    <div class="essentials-icon">
+                        <i class="bi bi-people"></i>
                     </div>
+                    <h5>Group Activities</h5>
+                    <p>Join community events and meet fellow campers</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="essentials-card text-center">
+                    <div class="essentials-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h5>Safety Tips</h5>
+                    <p>Important guidelines for a safe camping experience</p>
                 </div>
             </div>
         </div>

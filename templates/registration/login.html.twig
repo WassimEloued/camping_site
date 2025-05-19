@@ -2,41 +2,116 @@
 
 {% block title %}Login{% endblock %}
 
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .login-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+    
+    .login-card {
+        width: 100%;
+        max-width: 400px;
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .login-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 2rem;
+    }
+    
+    .login-body {
+        padding: 2rem;
+        background: white;
+        border-radius: 0 0 15px 15px;
+    }
+    
+    .form-control {
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .form-control:focus {
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        border-color: #3498db;
+    }
+    
+    .btn-login {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        border: none;
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+    }
+    
+    .login-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+    
+    .login-footer a {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .login-footer a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
 {% block body %}
-<div class="row justify-content-center align-items-center min-vh-100" style="background-image: url('{{ asset('campbg.jpg') }}'); background-size: cover; background-position: center;">
-    <div class="col-lg-6 col-md-8 col-12">
-        <div class="card shadow-lg bg-white bg-opacity-90">
-            <div class="card-header text-center bg-primary text-white">
-                <h2 class="fw-bold">Welcome Back</h2>
-                <p class="mb-0">Please enter your credentials to login</p>
-            </div>
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header text-center">
+            <h2 class="fw-bold mb-2">Welcome Back</h2>
+            <p class="mb-0">Please sign in to continue</p>
+        </div>
+        
+        <div class="login-body">
+            {# Authentication Errors #}
+            {% if error is defined and error %}
+                <div class="alert alert-danger alert-dismissible fade show">
+                    {% if error.messageKey == 'Invalid credentials.' %}
+                        Invalid email or password
+                    {% else %}
+                        {{ error.messageKey|trans(error.messageData, 'security') }}
+                    {% endif %}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
             
-            <div class="card-body p-4">
-                {# Authentication Errors #}
-                {% if error is defined and error %}
-                    <div class="alert alert-danger alert-dismissible fade show">
-                        {% if error.messageKey == 'Invalid credentials.' %}
-                            Invalid email or password
-                        {% else %}
-                            {{ error.messageKey|trans(error.messageData, 'security') }}
-                        {% endif %}
+            {# Flash Messages #}
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label }} alert-dismissible fade show">
+                        {{ message }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-                {% endif %}
-                
-                {# Flash Messages #}
-                {% for label, messages in app.flashes %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ label }} alert-dismissible fade show">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
                 {% endfor %}
-                
-                <form method="post" action="{{ path('app_login') }}" class="needs-validation" novalidate>
-                    <div class="mb-3">
-                        <label for="inputEmail" class="form-label">Email Address</label>
+            {% endfor %}
+            
+            <form method="post" action="{{ path('app_login') }}" class="needs-validation" novalidate>
+                <div class="mb-3">
+                    <label for="inputEmail" class="form-label">Email Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                         <input 
                             type="email" 
                             id="inputEmail" 
@@ -46,14 +121,18 @@
                             required
                             autocomplete="email"
                             autofocus
+                            placeholder="Enter your email"
                         >
-                        <div class="invalid-feedback">
-                            Please provide a valid email.
-                        </div>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="inputPassword" class="form-label">Password</label>
+                    <div class="invalid-feedback">
+                        Please provide a valid email.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="inputPassword" class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
                         <input 
                             type="password" 
                             id="inputPassword" 
@@ -61,35 +140,37 @@
                             class="form-control" 
                             required
                             autocomplete="current-password"
+                            placeholder="Enter your password"
                         >
-                        <div class="invalid-feedback">
-                            Please provide your password.
-                        </div>
                     </div>
-                    
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-                    
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="remember_me" name="_remember_me">
-                        <label class="form-check-label" for="remember_me">Remember me</label>
+                    <div class="invalid-feedback">
+                        Please provide your password.
                     </div>
-                    
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg">Login</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="remember_me" name="_remember_me">
+                    <label class="form-check-label" for="remember_me">Remember me</label>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-login">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                    </button>
+                </div>
+            </form>
             
-            <div class="card-footer text-center bg-light">
-                <p class="mb-0">Don't have an account? <a href="{{ path('app_register') }}" class="text-primary">Register here</a></p>
-                <p class="mt-2 mb-0"><a href="{{ path('app_forgot_password') }}" class="text-muted">Forgot password?</a></p>
+            <div class="login-footer">
+                <p class="mb-2">Don't have an account? <a href="{{ path('app_register') }}">Register here</a></p>
+                <p class="mb-0"><a href="{{ path('app_forgot_password') }}">Forgot password?</a></p>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-// Enhanced client-side validation
 document.addEventListener('DOMContentLoaded', () => {
     const forms = document.querySelectorAll('.needs-validation');
     
@@ -99,7 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 event.preventDefault();
                 event.stopPropagation();
                 
-                // Scroll to first invalid field
                 const invalidElements = this.querySelectorAll(':invalid');
                 if (invalidElements.length > 0) {
                     invalidElements[0].scrollIntoView({
@@ -112,7 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
             this.classList.add('was-validated');
         }, false);
         
-        // Real-time validation
         form.querySelectorAll('input').forEach(input => {
             input.addEventListener('input', () => {
                 if (input.checkValidity()) {

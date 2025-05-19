@@ -1,0 +1,41 @@
+@startuml Diagramme de Séquence - Processus de Réservation
+
+' Style settings
+skinparam sequence {
+    ArrowColor Black
+    LifeLineBorderColor Black
+    ParticipantBorderColor Black
+    ParticipantBackgroundColor White
+}
+
+' Participants
+actor "Utilisateur" as user
+participant "Interface Web" as web
+participant "Contrôleur" as controller
+participant "Service de Réservation" as service
+participant "Base de Données" as db
+participant "Service de Notification" as notification
+
+' Séquence
+user -> web: Accède à la page d'événement
+web -> controller: Demande les détails de l'événement
+controller -> db: Récupère les informations
+db --> controller: Retourne les données
+controller --> web: Affiche les détails
+web --> user: Présente l'événement
+
+user -> web: Clique sur "Réserver"
+web -> controller: Envoie la demande de réservation
+controller -> service: Vérifie la disponibilité
+service -> db: Vérifie le nombre de places
+db --> service: Confirme la disponibilité
+service --> controller: Valide la réservation
+
+controller -> db: Crée la réservation
+db --> controller: Confirme la création
+controller -> notification: Demande l'envoi d'une confirmation
+notification --> user: Envoie l'email de confirmation
+controller --> web: Affiche la confirmation
+web --> user: Affiche le message de succès
+
+@enduml 

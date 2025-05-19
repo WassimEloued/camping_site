@@ -1,0 +1,90 @@
+@startuml Diagramme de Classes - Site de Camping
+
+' Style settings
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+
+' Entités
+class Utilisateur {
+    -id: int
+    -email: string
+    -motDePasse: string
+    -prenom: string
+    -nom: string
+    -telephone: string
+    -role: string
+    +getEmail(): string
+    +getMotDePasse(): string
+    +getPrenom(): string
+    +getNom(): string
+    +getTelephone(): string
+    +getRole(): string
+}
+
+class Evenement {
+    -id: int
+    -titre: string
+    -description: text
+    -lieu: string
+    -dateDebut: datetime
+    -dateFin: datetime
+    -participantsMax: int
+    -budget: float
+    -photo: string
+    -dateCreation: datetime
+    -dateModification: datetime
+    +getTitre(): string
+    +getDescription(): text
+    +getLieu(): string
+    +getDateDebut(): datetime
+    +getDateFin(): datetime
+    +getParticipantsMax(): int
+    +getBudget(): float
+    +getPhoto(): string
+}
+
+class Reservation {
+    -id: int
+    -statut: string
+    -dateCreation: datetime
+    -dateModification: datetime
+    +getStatut(): string
+    +getDateCreation(): datetime
+    +getDateModification(): datetime
+}
+
+class Avis {
+    -id: int
+    -note: int
+    -commentaire: text
+    -dateCreation: datetime
+    +getNote(): int
+    +getCommentaire(): text
+    +getDateCreation(): datetime
+}
+
+class Equipement {
+    -id: int
+    -nom: string
+    -description: text
+    -prix: float
+    -disponible: boolean
+    +getNom(): string
+    +getDescription(): text
+    +getPrix(): float
+    +estDisponible(): boolean
+}
+
+' Relations
+Utilisateur "1" -- "*" Evenement : crée >
+Utilisateur "1" -- "*" Reservation : effectue >
+Utilisateur "1" -- "*" Avis : écrit >
+Evenement "1" -- "*" Reservation : possède >
+Evenement "1" -- "*" Avis : reçoit >
+Evenement "1" -- "*" Equipement : nécessite >
+
+@enduml 

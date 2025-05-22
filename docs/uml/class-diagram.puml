@@ -6,22 +6,18 @@ skinparam class {
     BackgroundColor White
     ArrowColor Black
     BorderColor Black
+    FontSize 14
 }
 
-' Entités
+' Classes arranged horizontally with organic flow
 class Utilisateur {
     -id: int
     -email: string
     -motDePasse: string
-    -prenom: string
     -nom: string
-    -telephone: string
     -role: string
     +getEmail(): string
-    +getMotDePasse(): string
-    +getPrenom(): string
     +getNom(): string
-    +getTelephone(): string
     +getRole(): string
 }
 
@@ -33,28 +29,20 @@ class Evenement {
     -dateDebut: datetime
     -dateFin: datetime
     -participantsMax: int
-    -budget: float
-    -photo: string
-    -dateCreation: datetime
-    -dateModification: datetime
     +getTitre(): string
-    +getDescription(): text
     +getLieu(): string
     +getDateDebut(): datetime
     +getDateFin(): datetime
-    +getParticipantsMax(): int
-    +getBudget(): float
-    +getPhoto(): string
 }
 
 class Reservation {
     -id: int
     -statut: string
     -dateCreation: datetime
-    -dateModification: datetime
+    -montantTotal: float
     +getStatut(): string
-    +getDateCreation(): datetime
-    +getDateModification(): datetime
+    +getMontantTotal(): float
+    +confirmer(): void
 }
 
 class Avis {
@@ -64,7 +52,6 @@ class Avis {
     -dateCreation: datetime
     +getNote(): int
     +getCommentaire(): text
-    +getDateCreation(): datetime
 }
 
 class Equipement {
@@ -74,17 +61,29 @@ class Equipement {
     -prix: float
     -disponible: boolean
     +getNom(): string
-    +getDescription(): text
     +getPrix(): float
     +estDisponible(): boolean
 }
 
-' Relations
+' Horizontal layout with staggered vertical positioning
+left to right direction
+
+Utilisateur -[hidden]r- Evenement
+Evenement -[hidden]r- Reservation
+Reservation -[hidden]r- Avis
+Avis -[hidden]r- Equipement
+
+' Vertical offsets for organic flow
+Evenement -[hidden]up- Reservation
+Avis -[hidden]down- Equipement
+
+' Relations principales
 Utilisateur "1" -- "*" Evenement : crée >
 Utilisateur "1" -- "*" Reservation : effectue >
 Utilisateur "1" -- "*" Avis : écrit >
+
 Evenement "1" -- "*" Reservation : possède >
 Evenement "1" -- "*" Avis : reçoit >
 Evenement "1" -- "*" Equipement : nécessite >
 
-@enduml 
+@enduml

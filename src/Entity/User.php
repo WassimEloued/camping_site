@@ -33,10 +33,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'creator')]
     private Collection $createdEvents;
 
+    #[ORM\Column(type: 'datetime')]
+    private $created_at;
+
     public function __construct()
     {
         $this->joinedEvents = new ArrayCollection();
         $this->createdEvents = new ArrayCollection();
+        $this->created_at = new \DateTimeImmutable();
     }
 
     /* Security Interface Methods */
@@ -186,6 +190,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsActive(bool $isActive): self
     {
         $this->isActive = $isActive;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $created_at): self
+    {
+        $this->created_at = $created_at;
         return $this;
     }
 

@@ -6,52 +6,58 @@ skinparam usecase {
     BackgroundColor White
     BorderColor Black
     ArrowColor Black
+    FontSize 14
 }
 
-' Acteurs
+' Acteurs (à droite)
 actor "Utilisateur" as user
 actor "Administrateur" as admin
 actor "Système" as system
 
-' Cas d'utilisation
-rectangle "Site de Camping" {
-    usecase "S'inscrire" as UC1
-    usecase "Se connecter" as UC2
-    usecase "Créer un événement" as UC3
-    usecase "Réserver un événement" as UC4
-    usecase "Gérer les réservations" as UC5
-    usecase "Laisser un avis" as UC6
-    usecase "Gérer les équipements" as UC7
-    usecase "Gérer les utilisateurs" as UC8
-    usecase "Modérer les avis" as UC9
-    usecase "Envoyer des notifications" as UC10
-}
+' Cas d'utilisation (au centre)
+usecase "S'inscrire/Se connecter" as UC1
+usecase "Gérer les événements" as UC2
+usecase "Réserver" as UC3
+usecase "Laisser un avis" as UC4
+usecase "Gérer les utilisateurs" as UC5
+usecase "Gérer les équipements" as UC6
+usecase "Modérer les avis" as UC7
+usecase "Notifications" as UC8
 
-' Relations
+' Layout
+user -[hidden]d- admin
+admin -[hidden]d- system
+
+UC1 -[hidden]r- UC2
+UC2 -[hidden]r- UC3
+UC3 -[hidden]r- UC4
+UC4 -[hidden]r- UC5
+UC5 -[hidden]r- UC6
+UC6 -[hidden]r- UC7
+UC7 -[hidden]r- UC8
+
+' Relations principales
 user --> UC1
 user --> UC2
 user --> UC3
 user --> UC4
-user --> UC6
 
-admin --> UC2
+admin --> UC1
 admin --> UC5
+admin --> UC6
 admin --> UC7
-admin --> UC8
-admin --> UC9
 
-system --> UC10
+system --> UC8
 
 ' Extensions et inclusions
-UC4 ..> UC2 : <<include>>
-UC6 ..> UC2 : <<include>>
-UC3 ..> UC2 : <<include>>
-UC5 ..> UC2 : <<include>>
-UC7 ..> UC2 : <<include>>
-UC8 ..> UC2 : <<include>>
-UC9 ..> UC2 : <<include>>
+UC2 ..> UC1 : <<include>>
+UC3 ..> UC1 : <<include>>
+UC4 ..> UC1 : <<include>>
+UC5 ..> UC1 : <<include>>
+UC6 ..> UC1 : <<include>>
+UC7 ..> UC1 : <<include>>
 
-UC4 ..> UC10 : <<extend>>
-UC5 ..> UC10 : <<extend>>
+UC3 ..> UC8 : <<extend>>
+UC2 ..> UC8 : <<extend>>
 
 @enduml 

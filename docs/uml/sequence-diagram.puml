@@ -10,32 +10,23 @@ skinparam sequence {
 
 ' Participants
 actor "Utilisateur" as user
-participant "Interface Web" as web
-participant "Contrôleur" as controller
-participant "Service de Réservation" as service
+participant "Interface" as web
+participant "Système" as system
 participant "Base de Données" as db
-participant "Service de Notification" as notification
 
-' Séquence
-user -> web: Accède à la page d'événement
-web -> controller: Demande les détails de l'événement
-controller -> db: Récupère les informations
-db --> controller: Retourne les données
-controller --> web: Affiche les détails
-web --> user: Présente l'événement
+' Séquence simplifiée
+user -> web: Consulte l'événement
+web -> system: Vérifie disponibilité
+system -> db: Récupère données
+db --> system: Confirme disponibilité
+system --> web: Affiche disponibilité
+web --> user: Montre détails
 
-user -> web: Clique sur "Réserver"
-web -> controller: Envoie la demande de réservation
-controller -> service: Vérifie la disponibilité
-service -> db: Vérifie le nombre de places
-db --> service: Confirme la disponibilité
-service --> controller: Valide la réservation
-
-controller -> db: Crée la réservation
-db --> controller: Confirme la création
-controller -> notification: Demande l'envoi d'une confirmation
-notification --> user: Envoie l'email de confirmation
-controller --> web: Affiche la confirmation
-web --> user: Affiche le message de succès
+user -> web: Réserve
+web -> system: Traite réservation
+system -> db: Enregistre
+db --> system: Confirme
+system --> web: Valide
+web --> user: Confirme réservation
 
 @enduml 

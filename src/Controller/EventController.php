@@ -21,13 +21,24 @@ class EventController extends AbstractController
     #[Route('/', name: 'event_index', methods: ['GET'])]
     public function index(EventRepository $eventRepository): Response
     {
-        // Get all approved events, regardless of who created them
-        $events = $eventRepository->createQueryBuilder('e')
+        $user = $this->getUser();
+        
+        // Get all approved events
+        $approvedEvents = $eventRepository->createQueryBuilder('e')
             ->andWhere('e.status = :status')
             ->setParameter('status', 'approved')
             ->orderBy('e.startDate', 'ASC')
             ->getQuery()
             ->getResult();
+            
+        // If user is logged in, also get their created events
+        $userEvents = [];
+        if ($user) {
+            $userEvents = $eventRepository->findByCreator($user);
+        }
+        
+        // Merge the arrays and remove duplicates
+        $events = array_unique(array_merge($approvedEvents, $userEvents), SORT_REGULAR);
         
         return $this->render('event/index.html.twig', [
             'events' => $events,
@@ -171,12 +182,18 @@ class EventController extends AbstractController
 
     #[Route('/{id}/approve', name: 'admin_event_approve', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
-    public function approve(Event $event, EntityManagerInterface $entityManager): Response
-    {
-        $event->setStatus('approved');
-        $entityManager->flush();
+    public function approve(
+        Request $request,
+        Event $event,
+        EntityManagerInterface $entityManager
+    ): Response {
+        if ($this->isCsrfTokenValid('approve'.$event->getId(), $request->request->get('_token'))) {
+            $event->setStatus('approved');
+            $entityManager->flush();
 
-        $this->addFlash('success', 'Event has been approved.');
+            $this->addFlash('success', 'Event has been approved and is now visible to all users.');
+        }
+
         return $this->redirectToRoute('admin_dashboard');
     }
 
@@ -220,9 +237,10 @@ class EventController extends AbstractController
         EntityManagerInterface $entityManager
     ): Response {
         if ($this->isCsrfTokenValid('reject'.$event->getId(), $request->request->get('_token'))) {
-            $event->setStatus('rejected');
+            $event->setStatus('cancelled');
             $entityManager->flush();
-            $this->addFlash('success', 'Event rejected');
+            
+            $this->addFlash('success', 'Event has been rejected.');
         }
 
         return $this->redirectToRoute('admin_dashboard');

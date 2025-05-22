@@ -31,7 +31,7 @@
                     <i class="bi bi-people-fill stat-icon"></i>
                     <h5 class="card-title">Total Users</h5>
                     <h2 class="mb-0">{{ stats.total_users }}</h2>
-                    <small>Active: {{ stats.active_users }}</small>
+                    <small>{{ stats.admin_users }} Admins / {{ stats.regular_users }} Regular Users</small>
                 </div>
             </div>
         </div>
@@ -67,6 +67,150 @@
         </div>
     </div>
 
+    <!-- Pending Events Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="card-title mb-0">Pending Events</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_events|filter(e => e.status == 'pending')|length > 0 %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Creator</th>
+                                        <th>Location</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for event in recent_events %}
+                                        {% if event.status == 'pending' %}
+                                            <tr>
+                                                <td>{{ event.title }}</td>
+                                                <td>{{ event.creator.email }}</td>
+                                                <td>{{ event.location }}</td>
+                                                <td>{{ event.startDate|date('M d, Y') }}</td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <form action="{{ path('admin_event_approve', {'id': event.id}) }}" method="POST" class="d-inline">
+                                                            <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ event.id) }}">
+                                                            <button type="submit" class="btn btn-success btn-sm">
+                                                                <i class="bi bi-check-circle"></i> Approve
+                                                            </button>
+                                                        </form>
+                                                        <form action="{{ path('event_reject', {'id': event.id}) }}" method="POST" class="d-inline ms-2">
+                                                            <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ event.id) }}">
+                                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                                <i class="bi bi-x-circle"></i> Reject
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mb-0">
+                            <i class="bi bi-info-circle"></i> No pending events to review.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Participation Stats -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">Event Participation</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <h6>Total Participants</h6>
+                                <h3>{{ stats.participation.total_participants }}</h3>
+                            </div>
+                            <div class="mb-3">
+                                <h6>Events with Participants</h6>
+                                <h3>{{ stats.participation.events_with_participants }}</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <h6>Average Participants</h6>
+                                <h3>{{ stats.participation.average_participants }}</h3>
+                            </div>
+                            {% if stats.participation.max_participants_event %}
+                                <div class="mb-3">
+                                    <h6>Most Popular Event</h6>
+                                    <p class="mb-0">{{ stats.participation.max_participants_event.title }}</p>
+                                    <small class="text-muted">{{ stats.participation.max_participants_event.count }} participants</small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">Top Event Creators</h5>
+                </div>
+                <div class="card-body">
+                    {% if stats.creators.top_creators|length > 0 %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Total Events</th>
+                                        <th>Approved</th>
+                                        <th>Success Rate</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for creator in stats.creators.top_creators %}
+                                        <tr>
+                                            <td>{{ creator.user.email }}</td>
+                                            <td>{{ creator.count }}</td>
+                                            <td>{{ creator.approved }}</td>
+                                            <td>
+                                                {% set successRate = creator.count > 0 ? (creator.approved / creator.count * 100)|round : 0 %}
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-success" role="progressbar" 
+                                                         style="width: {{ successRate }}%">
+                                                        {{ successRate }}%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mb-0">
+                            <i class="bi bi-info-circle"></i> No event creators yet.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Recent Activity -->
     <div class="row">
         <!-- Recent Events -->
@@ -77,7 +221,7 @@
                 </div>
                 <div class="card-body">
                     <div class="list-group">
-                        {% for event in stats.recent_events %}
+                        {% for event in recent_events %}
                             <div class="list-group-item">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h6 class="mb-1">{{ event.title }}</h6>
@@ -100,7 +244,7 @@
                 </div>
                 <div class="card-body">
                     <div class="list-group">
-                        {% for user in stats.recent_users %}
+                        {% for user in recent_users %}
                             <div class="list-group-item">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h6 class="mb-1">{{ user.email }}</h6>
@@ -127,24 +271,24 @@
                         <div class="col-md-4">
                             <div class="progress mb-3">
                                 <div class="progress-bar bg-success" role="progressbar" 
-                                     style="width: {{ (stats.events_by_status.approved / stats.total_events * 100)|round }}%">
-                                    Approved ({{ stats.events_by_status.approved }})
+                                     style="width: {{ stats.total_events > 0 ? (stats.events_by_status.approved|default(0) / stats.total_events * 100)|round : 0 }}%">
+                                    Approved ({{ stats.events_by_status.approved|default(0) }})
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="progress mb-3">
                                 <div class="progress-bar bg-warning" role="progressbar" 
-                                     style="width: {{ (stats.events_by_status.pending / stats.total_events * 100)|round }}%">
-                                    Pending ({{ stats.events_by_status.pending }})
+                                     style="width: {{ stats.total_events > 0 ? (stats.events_by_status.pending|default(0) / stats.total_events * 100)|round : 0 }}%">
+                                    Pending ({{ stats.events_by_status.pending|default(0) }})
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="progress mb-3">
                                 <div class="progress-bar bg-danger" role="progressbar" 
-                                     style="width: {{ (stats.events_by_status.rejected / stats.total_events * 100)|round }}%">
-                                    Rejected ({{ stats.events_by_status.rejected }})
+                                     style="width: {{ stats.total_events > 0 ? (stats.events_by_status.cancelled|default(0) / stats.total_events * 100)|round : 0 }}%">
+                                    Cancelled ({{ stats.events_by_status.cancelled|default(0) }})
                                 </div>
                             </div>
                         </div>

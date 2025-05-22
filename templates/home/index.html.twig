@@ -6,13 +6,15 @@
     {{ parent() }}
     <style>
         .hero-section {
-            background: linear-gradient(var(--overlay-color), var(--overlay-color)), url('{{ asset('images/camping-hero.jpg') }}');
+            background: linear-gradient(var(--overlay-color), var(--overlay-color)), url('{{ asset('images/campbg3.jpg') }}');
             background-size: cover;
             background-position: center;
             padding: 150px 0;
             margin-top: -1.5rem;
             margin-bottom: 4rem;
             position: relative;
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
         }
         
         .hero-section::after {
@@ -63,12 +65,14 @@
         }
         
         .cta-section {
-            background: linear-gradient(var(--overlay-color), var(--overlay-color)), url('{{ asset('images/camping-cta.jpg') }}');
+            background: linear-gradient(var(--overlay-color), var(--overlay-color)), url('{{ asset('images/campbg4.jpg') }}');
             background-size: cover;
             background-position: center;
             padding: 100px 0;
             margin: 4rem 0;
             position: relative;
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
         }
         
         .cta-section::before {
@@ -96,7 +100,8 @@
             font-weight: 600;
             margin-bottom: 3rem;
             text-align: center;
-            color: var(--dark-color);
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         
         .feature-title {

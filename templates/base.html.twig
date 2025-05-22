@@ -25,24 +25,42 @@
             --accent-color: #f7c35f;
             --dark-color: #2c3e50;
             --light-bg: rgba(255, 255, 255, 0.95);
-            --overlay-color: rgba(0, 0, 0, 0.6);
+            --overlay-color: rgba(0, 0, 0, 0.4);
         }
         
         body {
             font-family: 'Poppins', sans-serif;
-            background-image: url('{{ asset('images/camping-bg.jpg') }}');
+            background: linear-gradient(var(--overlay-color), var(--overlay-color)), url('{{ asset('images/campbg2.jpg') }}');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
+            background-repeat: no-repeat;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             color: var(--dark-color);
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(26, 95, 122, 0.05) 0%, rgba(136, 176, 75, 0.05) 100%);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            pointer-events: none;
+            z-index: -1;
         }
         
         .navbar {
             background-color: var(--primary-color) !important;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
         
         .navbar-brand {
@@ -56,6 +74,8 @@
             box-shadow: 0 8px 16px rgba(0,0,0,0.1);
             border: none;
             transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
         
         .card:hover {
@@ -89,22 +109,33 @@
             color: white;
             margin-top: auto;
             padding: 2rem 0;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
         
         .form-control {
             border-radius: 8px;
             padding: 0.75rem 1rem;
             border: 1px solid #dee2e6;
+            background-color: rgba(255, 255, 255, 0.9);
         }
         
         .form-control:focus {
             border-color: var(--secondary-color);
             box-shadow: 0 0 0 0.2rem rgba(136, 176, 75, 0.25);
+            background-color: white;
         }
         
         .alert {
             border-radius: 10px;
             border: none;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        main {
+            position: relative;
+            z-index: 1;
         }
     </style>
     {% endblock %}
@@ -141,20 +172,33 @@
                 </ul>
                 <ul class="navbar-nav">
                     {% if app.user %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle"></i> {{ app.user.email }}
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('admin_dashboard') }}">
+                                    <i class="bi bi-speedometer2"></i> Admin Panel
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('admin_users') }}">
+                                    <i class="bi bi-people"></i> Manage Users
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('admin_events') }}">
+                                    <i class="bi bi-calendar-event"></i> Manage Events
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('user_dashboard') }}">
+                                    <i class="bi bi-person-circle"></i> {{ app.user.email }}
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_logout') }}">
+                                <i class="bi bi-box-arrow-right"></i> Logout
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                {% if is_granted('ROLE_ADMIN') %}
-                                    <li><a class="dropdown-item" href="{{ path('admin_dashboard') }}">Admin Panel</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                {% else %}
-                                    <li><a class="dropdown-item" href="{{ path('user_dashboard') }}">My Profile</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                {% endif %}
-                                <li><a class="dropdown-item" href="{{ path('app_logout') }}">Logout</a></li>
-                            </ul>
                         </li>
                     {% else %}
                         <li class="nav-item">

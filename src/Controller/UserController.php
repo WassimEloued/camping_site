@@ -32,41 +32,89 @@ class UserController extends AbstractController
 
     #[Route('/admin/dashboard', name: 'admin_dashboard')]
     #[IsGranted('ROLE_ADMIN')]
-    public function adminDashboard(
-        UserRepository $userRepository,
-        EventRepository $eventRepository
-    ): Response {
-        // Get all users and events
-        $allUsers = $userRepository->findAll();
-        $allEvents = $eventRepository->findAll();
-        $approvedEvents = $eventRepository->findBy(['status' => 'approved']);
-        $pendingEvents = $eventRepository->findBy(['status' => 'pending']);
-        $rejectedEvents = $eventRepository->findBy(['status' => 'rejected']);
-
-        // Calculate statistics
+    public function adminDashboard(UserRepository $userRepository, EventRepository $eventRepository): Response
+    {
+        // Basic stats
         $stats = [
-            'total_users' => count($allUsers),
-            'total_events' => count($allEvents),
-            'approved_events' => count($approvedEvents),
-            'pending_events' => count($pendingEvents),
-            'rejected_events' => count($rejectedEvents),
-            'active_users' => count(array_filter($allUsers, fn($user) => $user->isActive())),
-            'admin_users' => count(array_filter($allUsers, fn($user) => $user->getRole() === 'ROLE_ADMIN')),
-            'regular_users' => count(array_filter($allUsers, fn($user) => $user->getRole() === 'ROLE_USER')),
+            'total_users' => $userRepository->count([]),
+            'total_events' => $eventRepository->count([]),
             'events_by_status' => [
-                'approved' => count($approvedEvents),
-                'pending' => count($pendingEvents),
-                'rejected' => count($rejectedEvents)
+                'approved' => $eventRepository->count(['status' => 'approved']),
+                'pending' => $eventRepository->count(['status' => 'pending']),
+                'cancelled' => $eventRepository->count(['status' => 'cancelled']),
             ],
-            'recent_events' => $eventRepository->findBy([], ['startDate' => 'DESC'], 5),
-            'recent_users' => $userRepository->findBy([], ['id' => 'DESC'], 5)
+            'admin_users' => $userRepository->count(['role' => 'ROLE_ADMIN']),
+            'regular_users' => $userRepository->count(['role' => 'ROLE_USER']),
+            'approved_events' => $eventRepository->count(['status' => 'approved']),
+            'pending_events' => $eventRepository->count(['status' => 'pending'])
         ];
 
+        // Event participation stats
+        $events = $eventRepository->findAll();
+        $totalParticipants = 0;
+        $eventsWithParticipants = 0;
+        $maxParticipantsEvent = null;
+        $maxParticipantsCount = 0;
+
+        foreach ($events as $event) {
+            $participantCount = $event->getParticipants()->count();
+            $totalParticipants += $participantCount;
+            
+            if ($participantCount > 0) {
+                $eventsWithParticipants++;
+            }
+            
+            if ($participantCount > $maxParticipantsCount) {
+                $maxParticipantsCount = $participantCount;
+                $maxParticipantsEvent = $event;
+            }
+        }
+
+        $stats['participation'] = [
+            'total_participants' => $totalParticipants,
+            'events_with_participants' => $eventsWithParticipants,
+            'average_participants' => $stats['total_events'] > 0 ? round($totalParticipants / $stats['total_events'], 1) : 0,
+            'max_participants_event' => $maxParticipantsEvent ? [
+                'title' => $maxParticipantsEvent->getTitle(),
+                'count' => $maxParticipantsCount
+            ] : null
+        ];
+
+        // Event creation stats
+        $activeCreators = [];
+        foreach ($events as $event) {
+            $creatorId = $event->getCreator()->getId();
+            if (!isset($activeCreators[$creatorId])) {
+                $activeCreators[$creatorId] = [
+                    'user' => $event->getCreator(),
+                    'count' => 0,
+                    'approved' => 0
+                ];
+            }
+            $activeCreators[$creatorId]['count']++;
+            if ($event->getStatus() === 'approved') {
+                $activeCreators[$creatorId]['approved']++;
+            }
+        }
+
+        // Sort creators by event count
+        uasort($activeCreators, function($a, $b) {
+            return $b['count'] - $a['count'];
+        });
+
+        $stats['creators'] = [
+            'total_creators' => count($activeCreators),
+            'top_creators' => array_slice($activeCreators, 0, 5, true)
+        ];
+
+        // Recent events and users
+        $recent_events = $eventRepository->findBy([], ['startDate' => 'DESC'], 5);
+        $recent_users = $userRepository->findBy([], ['id' => 'DESC'], 5);
+
         return $this->render('admin/dashboard.html.twig', [
-            'allUsers' => $allUsers,
-            'approvedEvents' => $approvedEvents,
-            'pendingEvents' => $pendingEvents,
-            'stats' => $stats
+            'stats' => $stats,
+            'recent_events' => $recent_events,
+            'recent_users' => $recent_users,
         ]);
     }
 

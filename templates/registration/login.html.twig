@@ -2,87 +2,196 @@
 
 {% block title %}Login{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .login-container {
+            min-height: calc(100vh - 76px);
+            display: flex;
+            align-items: center;
+            background: linear-gradient(var(--overlay-color), var(--overlay-color)), url('{{ asset('images/campbg.jpg') }}');
+            background-size: cover;
+            background-position: center;
+            padding: 2rem 0;
+        }
+        
+        .login-card {
+            background: var(--light-bg);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .login-header {
+            background: var(--primary-color);
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+        
+        .login-header::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            transform: rotate(45deg);
+        }
+        
+        .login-title {
+            color: white;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .login-subtitle {
+            color: rgba(255,255,255,0.8);
+            font-size: 1rem;
+        }
+        
+        .login-body {
+            padding: 3rem 2rem 2rem;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+        
+        .form-control {
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(136, 176, 75, 0.25);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-login {
+            padding: 0.75rem 2rem;
+            font-weight: 500;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .login-footer {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .login-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .login-footer a:hover {
+            color: var(--secondary-color);
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
-<div class="row justify-content-center align-items-center min-vh-100" style="background-image: url('{{ asset('campbg.jpg') }}'); background-size: cover; background-position: center;">
-    <div class="col-lg-6 col-md-8 col-12">
-        <div class="card shadow-lg bg-white bg-opacity-90">
-            <div class="card-header text-center bg-primary text-white">
-                <h2 class="fw-bold">Welcome Back</h2>
-                <p class="mb-0">Please enter your credentials to login</p>
-            </div>
-            
-            <div class="card-body p-4">
-                {# Authentication Errors #}
-                {% if error is defined and error %}
-                    <div class="alert alert-danger alert-dismissible fade show">
-                        {% if error.messageKey == 'Invalid credentials.' %}
-                            Invalid email or password
-                        {% else %}
-                            {{ error.messageKey|trans(error.messageData, 'security') }}
+<div class="login-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7">
+                <div class="login-card">
+                    <div class="login-header">
+                        <h2 class="login-title">Welcome Back</h2>
+                        <p class="login-subtitle">Please enter your credentials to login</p>
+                    </div>
+                    
+                    <div class="login-body">
+                        {# Authentication Errors #}
+                        {% if error is defined and error %}
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                {% if error.messageKey == 'Invalid credentials.' %}
+                                    Invalid email or password
+                                {% else %}
+                                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                                {% endif %}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
                         {% endif %}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endif %}
-                
-                {# Flash Messages #}
-                {% for label, messages in app.flashes %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ label }} alert-dismissible fade show">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
-                {% endfor %}
-                
-                <form method="post" action="{{ path('app_login') }}" class="needs-validation" novalidate>
-                    <div class="mb-3">
-                        <label for="inputEmail" class="form-label">Email Address</label>
-                        <input 
-                            type="email" 
-                            id="inputEmail" 
-                            name="_username" 
-                            class="form-control" 
-                            value="{{ last_username is defined ? last_username : '' }}"
-                            required
-                            autocomplete="email"
-                            autofocus
-                        >
-                        <div class="invalid-feedback">
-                            Please provide a valid email.
-                        </div>
+                        
+                        {# Flash Messages #}
+                        {% for label, messages in app.flashes %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ label }} alert-dismissible fade show">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                        
+                        <form method="post" action="{{ path('app_login') }}" class="needs-validation" novalidate>
+                            <div class="mb-4">
+                                <label for="inputEmail" class="form-label">Email Address</label>
+                                <input 
+                                    type="email" 
+                                    id="inputEmail" 
+                                    name="_username" 
+                                    class="form-control" 
+                                    value="{{ last_username is defined ? last_username : '' }}"
+                                    required
+                                    autocomplete="email"
+                                    autofocus
+                                >
+                                <div class="invalid-feedback">
+                                    Please provide a valid email.
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="inputPassword" class="form-label">Password</label>
+                                <input 
+                                    type="password" 
+                                    id="inputPassword" 
+                                    name="_password" 
+                                    class="form-control" 
+                                    required
+                                    autocomplete="current-password"
+                                >
+                                <div class="invalid-feedback">
+                                    Please provide your password.
+                                </div>
+                            </div>
+                            
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                            
+                            <div class="mb-4 form-check">
+                                <input type="checkbox" class="form-check-input" id="remember_me" name="_remember_me">
+                                <label class="form-check-label" for="remember_me">Remember me</label>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-login">Login</button>
+                            </div>
+                        </form>
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="inputPassword" class="form-label">Password</label>
-                        <input 
-                            type="password" 
-                            id="inputPassword" 
-                            name="_password" 
-                            class="form-control" 
-                            required
-                            autocomplete="current-password"
-                        >
-                        <div class="invalid-feedback">
-                            Please provide your password.
-                        </div>
+                    <div class="login-footer">
+                        <p class="mb-2">Don't have an account? <a href="{{ path('app_register') }}">Register here</a></p>
+                        <p class="mb-0"><a href="{{ path('app_forgot_password') }}">Forgot password?</a></p>
                     </div>
-                    
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-                    
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="remember_me" name="_remember_me">
-                        <label class="form-check-label" for="remember_me">Remember me</label>
-                    </div>
-                    
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg">Login</button>
-                    </div>
-                </form>
-            </div>
-            
-            <div class="card-footer text-center bg-light">
-                <p class="mb-0">Don't have an account? <a href="{{ path('app_register') }}" class="text-primary">Register here</a></p>
-                <p class="mt-2 mb-0"><a href="{{ path('app_forgot_password') }}" class="text-muted">Forgot password?</a></p>
+                </div>
             </div>
         </div>
     </div>

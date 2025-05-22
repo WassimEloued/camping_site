@@ -2,60 +2,196 @@
 
 {% block title %}Register{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .register-container {
+            min-height: calc(100vh - 76px);
+            display: flex;
+            align-items: center;
+            background: linear-gradient(var(--overlay-color), var(--overlay-color)), url('{{ asset('images/campbg.jpg') }}');
+            background-size: cover;
+            background-position: center;
+            padding: 2rem 0;
+        }
+        
+        .register-card {
+            background: var(--light-bg);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .register-header {
+            background: var(--primary-color);
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+        
+        .register-header::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            transform: rotate(45deg);
+        }
+        
+        .register-title {
+            color: white;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .register-subtitle {
+            color: rgba(255,255,255,0.8);
+            font-size: 1rem;
+        }
+        
+        .register-body {
+            padding: 3rem 2rem 2rem;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+        
+        .form-control {
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(136, 176, 75, 0.25);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-register {
+            padding: 0.75rem 2rem;
+            font-weight: 500;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .register-footer {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .register-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .register-footer a:hover {
+            color: var(--secondary-color);
+        }
+        
+        .terms-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .terms-link:hover {
+            color: var(--secondary-color);
+        }
+        
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+        }
+        
+        .modal-header {
+            background: var(--primary-color);
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid #e9ecef;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
-<div class="row justify-content-center align-items-center min-vh-100" style="background-image: url('{{ asset('campbg.jpg') }}'); background-size: cover; background-position: center;">
-    <div class="col-lg-6 col-md-8 col-12">
-        <div class="card shadow-lg bg-white bg-opacity-90">
-            <div class="card-header text-center bg-primary text-white">
-                <h2 class="fw-bold">Create Your Account</h2>
-                <p class="mb-0">Join our camping community</p>
-            </div>
-            
-            <div class="card-body p-4">
-                {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
-                    {{ form_errors(form) }}
-                    
-                    <div class="mb-3">
-                        {{ form_label(form.email, null, {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(form.email, {'attr': {'class': 'form-control' ~ (form.email.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'your@email.com'}}) }}
-                        <div class="invalid-feedback">
-                            {{ form_errors(form.email) }}
-                        </div>
+<div class="register-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="register-card">
+                    <div class="register-header">
+                        <h2 class="register-title">Create Your Account</h2>
+                        <p class="register-subtitle">Join our camping community</p>
                     </div>
                     
-                    <div class="mb-3">
-                        {{ form_label(form.password.first, 'Password', {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(form.password.first, {'attr': {'class': 'form-control' ~ (form.password.first.vars.errors|length ? ' is-invalid' : '')}}) }}
-                        <div class="invalid-feedback">
-                            {{ form_errors(form.password.first) }}
-                        </div>
-                        <small class="text-muted">Minimum 6 characters</small>
+                    <div class="register-body">
+                        {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                            {{ form_errors(form) }}
+                            
+                            <div class="mb-4">
+                                {{ form_label(form.email, null, {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.email, {'attr': {'class': 'form-control' ~ (form.email.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'your@email.com'}}) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.email) }}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                {{ form_label(form.password.first, 'Password', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.password.first, {'attr': {'class': 'form-control' ~ (form.password.first.vars.errors|length ? ' is-invalid' : '')}}) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.password.first) }}
+                                </div>
+                                <small class="text-muted">Minimum 6 characters</small>
+                            </div>
+                            
+                            <div class="mb-4">
+                                {{ form_label(form.password.second, 'Repeat Password', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.password.second, {'attr': {'class': 'form-control' ~ (form.password.second.vars.errors|length ? ' is-invalid' : '')}}) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.password.second) }}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4 form-check">
+                                <input type="checkbox" class="form-check-input" id="terms" required>
+                                <label class="form-check-label" for="terms">
+                                    I agree to the <a href="#" class="terms-link" data-bs-toggle="modal" data-bs-target="#termsModal">terms and conditions</a>
+                                </label>
+                                <div class="invalid-feedback">
+                                    You must agree before submitting.
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-register">Register</button>
+                            </div>
+                        {{ form_end(form) }}
                     </div>
                     
-                    <div class="mb-3">
-                        {{ form_label(form.password.second, 'Repeat Password', {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(form.password.second, {'attr': {'class': 'form-control' ~ (form.password.second.vars.errors|length ? ' is-invalid' : '')}}) }}
-                        <div class="invalid-feedback">
-                            {{ form_errors(form.password.second) }}
-                        </div>
+                    <div class="register-footer">
+                        <p class="mb-0">Already have an account? <a href="{{ path('app_login') }}">Login here</a></p>
                     </div>
-                    
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="terms" required>
-                        <label class="form-check-label" for="terms">I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">terms and conditions</a></label>
-                        <div class="invalid-feedback">
-                            You must agree before submitting.
-                        </div>
-                    </div>
-                    
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg">Register</button>
-                    </div>
-                {{ form_end(form) }}
-            </div>
-            
-            <div class="card-footer text-center bg-light">
-                <p class="mb-0">Already have an account? <a href="{{ path('app_login') }}" class="text-primary">Login here</a></p>
+                </div>
             </div>
         </div>
     </div>
@@ -70,8 +206,22 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <!-- Add your terms here -->
-                <p>By registering, you agree to our community guidelines and privacy policy...</p>
+                <h6>Community Guidelines</h6>
+                <p>By registering, you agree to:</p>
+                <ul>
+                    <li>Respect other community members</li>
+                    <li>Follow safety guidelines for camping events</li>
+                    <li>Provide accurate information about events</li>
+                    <li>Maintain a positive and inclusive environment</li>
+                </ul>
+                
+                <h6>Privacy Policy</h6>
+                <p>We respect your privacy and will:</p>
+                <ul>
+                    <li>Protect your personal information</li>
+                    <li>Never share your data with third parties</li>
+                    <li>Allow you to control your privacy settings</li>
+                </ul>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -90,9 +240,31 @@
             if (!form.checkValidity()) {
                 event.preventDefault()
                 event.stopPropagation()
+                
+                // Scroll to first invalid field
+                const invalidElements = form.querySelectorAll(':invalid');
+                if (invalidElements.length > 0) {
+                    invalidElements[0].scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
             }
             form.classList.add('was-validated')
         }, false)
+        
+        // Real-time validation
+        form.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', () => {
+                if (input.checkValidity()) {
+                    input.classList.remove('is-invalid');
+                    input.classList.add('is-valid');
+                } else {
+                    input.classList.remove('is-valid');
+                    input.classList.add('is-invalid');
+                }
+            });
+        });
     })
 })()
 </script>

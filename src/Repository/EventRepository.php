@@ -49,7 +49,9 @@ class EventRepository extends ServiceEntityRepository
 
     public function findAllApproved(): array
     {
-        return $this->createStatusQueryBuilder('approved')
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.status = :status')
+            ->setParameter('status', 'approved')
             ->orderBy('e.startDate', 'ASC')
             ->getQuery()
             ->getResult();

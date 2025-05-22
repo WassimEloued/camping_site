@@ -21,7 +21,13 @@ class EventController extends AbstractController
     #[Route('/', name: 'event_index', methods: ['GET'])]
     public function index(EventRepository $eventRepository): Response
     {
-        $events = $eventRepository->findBy(['status' => 'approved']);
+        // Get all approved events, regardless of who created them
+        $events = $eventRepository->createQueryBuilder('e')
+            ->andWhere('e.status = :status')
+            ->setParameter('status', 'approved')
+            ->orderBy('e.startDate', 'ASC')
+            ->getQuery()
+            ->getResult();
         
         return $this->render('event/index.html.twig', [
             'events' => $events,
